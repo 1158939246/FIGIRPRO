@@ -1,0 +1,258 @@
+[
+    {
+        "tool_name": "extract_keywords",
+        "keywords": [
+            "predicted year of death",
+            "individuals",
+            "Zambia's independence",
+            "country's life expectancy",
+            "per capita GNP",
+            "average per capita GNP",
+            "European countries",
+            "10-year increase",
+            "GNP",
+            "population",
+            "age",
+            "date of birth",
+            "given date"
+        ],
+        "status": "success",
+        "execution_time": 3.2
+    },
+    {
+        "tool_name": "retrieve_entity",
+        "similar_columns": {
+            "city": [
+                "Population"
+            ],
+            "country": [
+                "GNP",
+                "Capital",
+                "Population"
+            ]
+        },
+        "schema_with_examples": {
+            "country": {
+                "Continent": [
+                    "Europe"
+                ]
+            }
+        },
+        "status": "success",
+        "execution_time": 1.8
+    },
+    {
+        "tool_name": "retrieve_context",
+        "schema_with_descriptions": {},
+        "status": "success",
+        "execution_time": 27.2
+    },
+    {
+        "tool_name": "filter_column",
+        "tentative_schema": {
+            "city": [
+                "Population"
+            ],
+            "country": [
+                "IndepYear",
+                "Population",
+                "LifeExpectancy",
+                "GNP",
+                "GNPOld",
+                "Capital"
+            ],
+            "countrylanguage": []
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'country'.'continent'",
+            "'country'.'Europe'",
+            "'country'.'name'"
+        ],
+        "correct_columns": {
+            "country": [
+                "continent",
+                "Europe",
+                "population",
+                "gnp",
+                "name",
+                "indepyear",
+                "lifeexpectancy"
+            ]
+        },
+        "status": "success",
+        "execution_time": 7.9
+    },
+    {
+        "tool_name": "select_tables",
+        "chain_of_thought_reasoning": "To answer the question, we need to determine the predicted year of death for individuals born in the year of Zambia's independence, which is 1964. This requires information about Zambia's life expectancy, which is found in the 'country' table. Additionally, we need to calculate the average per capita GNP of all European countries and compare it to Zambia's GNP per capita to determine if it qualifies for the 10-year increase in life expectancy. The 'country' table contains the GNP and population data necessary for this calculation. The 'countrylanguage' table is not necessary for this query as it does not provide relevant information regarding GNP or life expectancy. Therefore, the 'country' table is essential for obtaining both Zambia's life expectancy and the GNP data needed for the per capita calculation.",
+        "selected_tables": [
+            "country"
+        ],
+        "tentative_schema": {
+            "country": [
+                "IndepYear",
+                "Population",
+                "LifeExpectancy",
+                "GNP",
+                "GNPOld",
+                "Capital"
+            ],
+            "city": [
+                "Population"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'country'.'continent'",
+            "'country'.'Europe'",
+            "'country'.'name'"
+        ],
+        "correct_columns": {
+            "country": [
+                "continent",
+                "Europe",
+                "population",
+                "gnp",
+                "name",
+                "indepyear",
+                "lifeexpectancy"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.3
+    },
+    {
+        "tool_name": "select_columns",
+        "chain_of_thought_reasoning": "To answer the question, we need to determine Zambia's independence year, which requires the 'IndepYear' column from the 'country' table. We also need the 'LifeExpectancy' column to understand the life expectancy at that time. To calculate the GNP per capita, we need both the 'GNP' and 'Population' columns from the 'country' table. Additionally, we need to filter countries based on their GNP per capita compared to the average of European countries, which requires the 'Code' column to identify countries. The 'Population' column from the 'city' table is also relevant for understanding the population context. Thus, the selected columns are essential for calculating the predicted year of death based on life expectancy adjustments.",
+        "selected_columns": {
+            "country": [
+                "IndepYear",
+                "LifeExpectancy",
+                "GNP",
+                "Population",
+                "Code"
+            ],
+            "city": [
+                "Population"
+            ]
+        },
+        "tentative_schema": {
+            "country": [
+                "IndepYear",
+                "LifeExpectancy",
+                "GNP",
+                "Population",
+                "Code"
+            ],
+            "city": [
+                "Population"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'country'.'continent'",
+            "'country'.'Europe'",
+            "'country'.'name'"
+        ],
+        "correct_columns": {
+            "country": [
+                "continent",
+                "Europe",
+                "population",
+                "gnp",
+                "name",
+                "indepyear",
+                "lifeexpectancy"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.7
+    },
+    {
+        "tool_name": "generate_candidate",
+        "node_type": "generate_candidate",
+        "generation_based_candidates": [
+            {
+                "template_name": "generate_candidate_one",
+                "candidates": [
+                    " SELECT      CASE          WHEN `GNP` / `Population` > (SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Region` = 'Europe')          THEN 1964 + (`LifeExpectancy` + 10)          ELSE 1964 + `LifeExpectancy`      END AS predicted_year_of_death  FROM `country`  WHERE `IndepYear` = 1964 ",
+                    " SELECT (1964 + CASE      WHEN (SELECT GNP / Population FROM country WHERE Code = 'ZMB') > (SELECT AVG(GNP / Population) FROM country WHERE Region = 'Europe')      THEN (SELECT LifeExpectancy FROM country WHERE Code = 'ZMB') + 10      ELSE (SELECT LifeExpectancy FROM country WHERE Code = 'ZMB')  END) AS predicted_year_of_death ",
+                    " SELECT 1964 + (CASE WHEN (SELECT GNP / Population FROM country WHERE Name = 'Zambia') > (SELECT AVG(GNP / Population) FROM country WHERE Continent = 'Europe') THEN LifeExpectancy + 10 ELSE LifeExpectancy END) FROM country WHERE Name = 'Zambia' "
+                ]
+            }
+        ],
+        "candidates": [
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT      CASE          WHEN `GNP` / `Population` > (SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Region` = 'Europe')          THEN 1964 + (`LifeExpectancy` + 10)          ELSE 1964 + `LifeExpectancy`      END AS predicted_year_of_death  FROM `country`  WHERE `IndepYear` = 1964 ",
+                "plan": "**Question**: What is the predicted year of death for individuals born during the year of Zambia's independence, according to the country's life expectancy, if countries with a per capita GNP higher than the average per capita GNP of all European countries experience a 10-year increase in life expectancy?  \n**Evidence**: GNP per capita is computed by dividing the GNP by the population. Age is calculated by subtracting date of birth from a given date.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** What is the predicted year of death for individuals born during the year of Zambia's independence, according to the country's life expectancy, if countries with a per capita GNP higher than the average per capita GNP of all European countries experience a 10-year increase in life expectancy?\n    * **Analysis:** We need to find the year of death based on life expectancy for individuals born in the year of Zambia's independence (1964). We will calculate the per capita GNP for countries and compare it to the average per capita GNP of European countries. If it exceeds this average, we will add 10 years to the life expectancy.\n    * **Pseudo SQL:** SELECT `predicted_year_of_death` FROM `country` WHERE `year_of_birth` = 1964 AND <condition for GNP per capita>\n\n    * **Sub-question 1:** Calculate average per capita GNP of all European countries\n        * **Analysis:** We need to filter the `country` table for European countries and calculate the average per capita GNP.\n        * **Pseudo SQL:** SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Region` = 'Europe'\n\n    * **Sub-question 2:** Calculate per capita GNP for each country\n        * **Analysis:** We will compute the per capita GNP for each country and check if it is greater than the average calculated in Sub-question 1.\n        * **Pseudo SQL:** `GNP` / `Population` > (SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Region` = 'Europe')\n\n    * **Sub-question 3:** Calculate predicted year of death\n        * **Analysis:** The predicted year of death is calculated by adding the life expectancy to the birth year (1964). If the country qualifies for the 10-year increase, we will add 10 years to the life expectancy.\n        * **Pseudo SQL:** `1964 + (LifeExpectancy + 10)` if `GNP` / `Population` > average, else `1964 + LifeExpectancy`\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (average per capita GNP of European countries):**\n    * **SQL:** SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Region` = 'Europe'\n\n* **Sub-question 2 (per capita GNP for each country):**\n    * **SQL:** `GNP` / `Population` > (SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Region` = 'Europe')\n\n* **Sub-question 3 (predicted year of death):**\n    * **SQL:** \n    ```sql\n    CASE \n        WHEN `GNP` / `Population` > (SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Region` = 'Europe') \n        THEN 1964 + (`LifeExpectancy` + 10) \n        ELSE 1964 + `LifeExpectancy` \n    END\n    ```\n\n* **Main Question (predicted year of death for individuals born in 1964):**\n    * **SQL:** \n    ```sql\n    SELECT \n        CASE \n            WHEN `GNP` / `Population` > (SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Region` = 'Europe') \n            THEN 1964 + (`LifeExpectancy` + 10) \n            ELSE 1964 + `LifeExpectancy` \n        END AS predicted_year_of_death \n    FROM `country` \n    WHERE `IndepYear` = 1964\n    ```\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by directly calculating the predicted year of death in a single query without needing to separate the calculations into multiple sub-queries.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT (1964 + CASE      WHEN (SELECT GNP / Population FROM country WHERE Code = 'ZMB') > (SELECT AVG(GNP / Population) FROM country WHERE Region = 'Europe')      THEN (SELECT LifeExpectancy FROM country WHERE Code = 'ZMB') + 10      ELSE (SELECT LifeExpectancy FROM country WHERE Code = 'ZMB')  END) AS predicted_year_of_death ",
+                "plan": "**Question**: What is the predicted year of death for individuals born during the year of Zambia's independence, according to the country's life expectancy, if countries with a per capita GNP higher than the average per capita GNP of all European countries experience a 10-year increase in life expectancy?  \n**Evidence**: GNP per capita is computed by dividing the GNP by the population. Age is calculated by subtracting date of birth from a given date.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** What is the predicted year of death for individuals born during the year of Zambia's independence?\n    * **Analysis:** We need to find the life expectancy for Zambia and adjust it based on the conditions provided. We will also need to determine the year of Zambia's independence, which is 1964. The predicted year of death will be calculated by adding the life expectancy to the birth year.\n    * **Pseudo SQL:** SELECT (1964 + <adjusted life expectancy>) AS predicted_year_of_death FROM country WHERE Code = 'ZMB'\n\n    * **Sub-question 1:** Adjusted life expectancy for Zambia\n        * **Analysis:** We need to check if Zambia's GNP per capita is higher than the average GNP per capita of all European countries. If it is, we will add 10 years to Zambia's life expectancy.\n        * **Pseudo SQL:** (SELECT LifeExpectancy + 10 FROM country WHERE Code = 'ZMB') WHERE (SELECT GNP / Population FROM country WHERE Code = 'ZMB') > (SELECT AVG(GNP / Population) FROM country WHERE Region = 'Europe')\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (adjusted life expectancy for Zambia):**\n    * **SQL:** \n    ```sql\n    (SELECT LifeExpectancy + 10 FROM country WHERE Code = 'ZMB') \n    WHERE (SELECT GNP / Population FROM country WHERE Code = 'ZMB') > (SELECT AVG(GNP / Population) FROM country WHERE Region = 'Europe')\n    ```\n\n* **Main Question (predicted year of death):**\n    * **SQL:** \n    ```sql\n    SELECT (1964 + \n        (SELECT CASE \n            WHEN (SELECT GNP / Population FROM country WHERE Code = 'ZMB') > (SELECT AVG(GNP / Population) FROM country WHERE Region = 'Europe') \n            THEN LifeExpectancy + 10 \n            ELSE LifeExpectancy \n        END \n        FROM country WHERE Code = 'ZMB')) AS predicted_year_of_death\n    ```\n\n**3. Simplification and Optimization:**\n\n* The SQL query can be simplified by using a single SELECT statement that incorporates the logic for adjusting life expectancy directly.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT 1964 + (CASE WHEN (SELECT GNP / Population FROM country WHERE Name = 'Zambia') > (SELECT AVG(GNP / Population) FROM country WHERE Continent = 'Europe') THEN LifeExpectancy + 10 ELSE LifeExpectancy END) FROM country WHERE Name = 'Zambia' ",
+                "plan": "**Question**: What is the predicted year of death for individuals born during the year of Zambia's independence, according to the country's life expectancy, if countries with a per capita GNP higher than the average per capita GNP of all European countries experience a 10-year increase in life expectancy?  \n**Evidence**: GNP per capita is computed by dividing the GNP by the population. Age is calculated by subtracting date of birth from a given date.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** What is the predicted year of death for individuals born during the year of Zambia's independence, according to the country's life expectancy, if countries with a per capita GNP higher than the average per capita GNP of all European countries experience a 10-year increase in life expectancy?\n    * **Analysis:** We need to find the life expectancy for Zambia and adjust it based on the GNP per capita condition. The predicted year of death can be calculated by adding the life expectancy to the year of birth (Zambia's independence year).\n    * **Pseudo SQL:** SELECT `year_of_birth` + <adjusted life expectancy> FROM `country` WHERE <Zambia's independence year> AND <GNP per capita condition>\n\n    * **Sub-question 1:** Zambia's independence year\n        * **Analysis:** Zambia gained independence in 1964. We will filter for this year.\n        * **Pseudo SQL:** `IndepYear` = 1964\n\n    * **Sub-question 2:** Adjusted life expectancy\n        * **Analysis:** We need to calculate the average per capita GNP of all European countries and compare it to Zambia's per capita GNP. If Zambia's per capita GNP is higher, we will add 10 years to its life expectancy.\n        * **Pseudo SQL:** \n            * Calculate average per capita GNP for European countries: \n                * `AVG(GNP / Population)` for countries in Europe\n            * Calculate Zambia's per capita GNP: \n                * `GNP / Population` for Zambia\n            * Adjusted life expectancy: \n                * `LifeExpectancy + 10` if `Zambia's per capita GNP > average per capita GNP of Europe`\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (Zambia's independence year):**\n    * **SQL:** `IndepYear` = 1964\n\n* **Sub-question 2 (Adjusted life expectancy):**\n    * **SQL:** \n        * Calculate average per capita GNP for European countries:\n            * `AVG(GNP / Population)` FROM `country` WHERE `Continent` = 'Europe'\n        * Calculate Zambia's per capita GNP:\n            * `GNP / Population` FROM `country` WHERE `Name` = 'Zambia'\n        * Adjusted life expectancy:\n            * `LifeExpectancy + 10` if `GNP / Population > (SELECT AVG(GNP / Population) FROM country WHERE Continent = 'Europe')`\n\n* **Main Question (predicted year of death):**\n    * **SQL:** \n    ```sql\n    SELECT 1964 + \n    (CASE \n        WHEN (SELECT GNP / Population FROM country WHERE Name = 'Zambia') > \n             (SELECT AVG(GNP / Population) FROM country WHERE Continent = 'Europe') \n        THEN LifeExpectancy + 10 \n        ELSE LifeExpectancy \n    END) \n    FROM country WHERE Name = 'Zambia'\n    ```\n\n**3. Simplification and Optimization:**\n\n* The SQL query can be simplified by directly calculating the adjusted life expectancy in the main query without needing to separate the calculations into sub-queries.\n\n**Final Optimized SQL Query:**\n\n"
+            }
+        ],
+        "status": "success",
+        "execution_time": 13.3
+    },
+    {
+        "tool_name": "revise",
+        "original_SQL_id": "generate_candidate",
+        "refined_SQL_id": "revise_1",
+        "candidates": [
+            {
+                "refined_query": " SELECT      CASE          WHEN `GNP` / `Population` > (SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Region` = 'Europe')          THEN 1964 + (`LifeExpectancy` + 10)          ELSE 1964 + `LifeExpectancy`      END AS predicted_year_of_death  FROM `country`  WHERE `IndepYear` = 1964 "
+            },
+            {
+                "refined_query": " SELECT (1964 + CASE      WHEN (SELECT GNP / Population FROM country WHERE Code = 'ZMB') > (SELECT AVG(GNP / Population) FROM country WHERE Region = 'Europe')      THEN (SELECT LifeExpectancy FROM country WHERE Code = 'ZMB') + 10      ELSE (SELECT LifeExpectancy FROM country WHERE Code = 'ZMB')  END) AS predicted_year_of_death "
+            },
+            {
+                "refined_query": " SELECT 1964 + (CASE WHEN (SELECT GNP / Population FROM country WHERE Name = 'Zambia') > (SELECT AVG(GNP / Population) FROM country WHERE Continent = 'Europe') THEN LifeExpectancy + 10 ELSE LifeExpectancy END) FROM country WHERE Name = 'Zambia' "
+            }
+        ],
+        "status": "success",
+        "execution_time": 0.1
+    },
+    {
+        "tool_name": "execution_accuracy",
+        "generate_candidate": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "What is the predicted year of death for individuals born during the year of Zambia's independence, according to the country's life expectancy, if countries with a per capita GNP higher than the average per capita GNP of all European countries experience a 10-year increase in life expectancy?",
+            "Evidence": "GNP per capita is computed by dividing the GNP by the population.  Age is calculated by subtracting date of birth from a given date.",
+            "GOLD_SQL": "SELECT CAST ( IndepYear + LifeExpectancy AS INT ) AS death_year FROM ( SELECT name , IndepYear , LifeExpectancy + 10 AS LifeExpectancy FROM country WHERE 1.0 * GNP / Population > ( SELECT 1.0 * SUM ( GNP ) / SUM ( Population ) FROM country WHERE Continent = \"Europe\" ) UNION ALL SELECT name , IndepYear , LifeExpectancy FROM country WHERE NOT ( 1.0 * GNP / Population > ( SELECT 1.0 * SUM ( GNP ) / SUM ( Population ) FROM country WHERE Continent = \"Europe\" ) ) ) WHERE name = \"Zambia\"",
+            "PREDICTED_SQL": " SELECT      CASE          WHEN `GNP` / `Population` > (SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Region` = 'Europe')          THEN 1964 + (`LifeExpectancy` + 10)          ELSE 1964 + `LifeExpectancy`      END AS predicted_year_of_death  FROM `country`  WHERE `IndepYear` = 1964 "
+        },
+        "revise_1": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "What is the predicted year of death for individuals born during the year of Zambia's independence, according to the country's life expectancy, if countries with a per capita GNP higher than the average per capita GNP of all European countries experience a 10-year increase in life expectancy?",
+            "Evidence": "GNP per capita is computed by dividing the GNP by the population.  Age is calculated by subtracting date of birth from a given date.",
+            "GOLD_SQL": "SELECT CAST ( IndepYear + LifeExpectancy AS INT ) AS death_year FROM ( SELECT name , IndepYear , LifeExpectancy + 10 AS LifeExpectancy FROM country WHERE 1.0 * GNP / Population > ( SELECT 1.0 * SUM ( GNP ) / SUM ( Population ) FROM country WHERE Continent = \"Europe\" ) UNION ALL SELECT name , IndepYear , LifeExpectancy FROM country WHERE NOT ( 1.0 * GNP / Population > ( SELECT 1.0 * SUM ( GNP ) / SUM ( Population ) FROM country WHERE Continent = \"Europe\" ) ) ) WHERE name = \"Zambia\"",
+            "PREDICTED_SQL": " SELECT      CASE          WHEN `GNP` / `Population` > (SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Region` = 'Europe')          THEN 1964 + (`LifeExpectancy` + 10)          ELSE 1964 + `LifeExpectancy`      END AS predicted_year_of_death  FROM `country`  WHERE `IndepYear` = 1964 "
+        },
+        "final_SQL": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "What is the predicted year of death for individuals born during the year of Zambia's independence, according to the country's life expectancy, if countries with a per capita GNP higher than the average per capita GNP of all European countries experience a 10-year increase in life expectancy?",
+            "Evidence": "GNP per capita is computed by dividing the GNP by the population.  Age is calculated by subtracting date of birth from a given date.",
+            "GOLD_SQL": "SELECT CAST ( IndepYear + LifeExpectancy AS INT ) AS death_year FROM ( SELECT name , IndepYear , LifeExpectancy + 10 AS LifeExpectancy FROM country WHERE 1.0 * GNP / Population > ( SELECT 1.0 * SUM ( GNP ) / SUM ( Population ) FROM country WHERE Continent = \"Europe\" ) UNION ALL SELECT name , IndepYear , LifeExpectancy FROM country WHERE NOT ( 1.0 * GNP / Population > ( SELECT 1.0 * SUM ( GNP ) / SUM ( Population ) FROM country WHERE Continent = \"Europe\" ) ) ) WHERE name = \"Zambia\"",
+            "PREDICTED_SQL": " SELECT      CASE          WHEN `GNP` / `Population` > (SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Region` = 'Europe')          THEN 1964 + (`LifeExpectancy` + 10)          ELSE 1964 + `LifeExpectancy`      END AS predicted_year_of_death  FROM `country`  WHERE `IndepYear` = 1964 "
+        },
+        "status": "success",
+        "execution_time": 0.0
+    }
+]

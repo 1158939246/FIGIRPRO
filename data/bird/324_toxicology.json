@@ -1,0 +1,225 @@
+[
+    {
+        "tool_name": "extract_keywords",
+        "keywords": [
+            "percentage",
+            "atoms",
+            "single bond",
+            "bond_type",
+            "bond_id",
+            "DIVIDE",
+            "SUM",
+            "COUNT"
+        ],
+        "status": "success",
+        "execution_time": 1.0
+    },
+    {
+        "tool_name": "retrieve_entity",
+        "similar_columns": {
+            "bond": [
+                "bond_id",
+                "bond_type"
+            ],
+            "connected": [
+                "bond_id"
+            ]
+        },
+        "schema_with_examples": {},
+        "status": "success",
+        "execution_time": 0.8
+    },
+    {
+        "tool_name": "retrieve_context",
+        "schema_with_descriptions": {
+            "connected": {
+                "bond_id": {
+                    "column_name": "bond id",
+                    "column_description": "bond id representing bond between two atoms",
+                    "value_description": ""
+                },
+                "atom_id2": {
+                    "column_name": "atom id 2",
+                    "column_description": "id of the second atom",
+                    "value_description": ""
+                },
+                "atom_id": {
+                    "column_name": "atom id",
+                    "column_description": "id of the first atom",
+                    "value_description": ""
+                }
+            },
+            "bond": {
+                "bond_type": {
+                    "column_name": "",
+                    "column_description": "type of the bond",
+                    "value_description": "\u0093-\u0094: single bond '=': double bond '#': triple bond"
+                },
+                "molecule_id": {
+                    "column_name": "",
+                    "column_description": "identifying the molecule in which the bond appears",
+                    "value_description": ""
+                },
+                "bond_id": {
+                    "column_name": "",
+                    "column_description": "unique id representing bonds",
+                    "value_description": "TRxxx_A1_A2: TRXXX refers to which molecule A1 and A2 refers to which atom"
+                }
+            },
+            "atom": {
+                "molecule_id": {
+                    "column_name": "molecule id",
+                    "column_description": "identifying the molecule to which the atom belongs",
+                    "value_description": "TRXXX_i represents ith atom of molecule TRXXX"
+                }
+            }
+        },
+        "status": "success",
+        "execution_time": 7.8
+    },
+    {
+        "tool_name": "filter_column",
+        "tentative_schema": {
+            "atom": [],
+            "bond": [
+                "bond_id",
+                "bond_type"
+            ],
+            "connected": [
+                "bond_id"
+            ],
+            "molecule": []
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "bond": [
+                "bond_id",
+                "bond_type"
+            ]
+        },
+        "status": "success",
+        "execution_time": 1.8
+    },
+    {
+        "tool_name": "select_tables",
+        "chain_of_thought_reasoning": "To find the percentage of atoms with a single bond, we need to analyze the bond types associated with atoms. The 'bond' table contains the 'bond_type' column, which indicates whether a bond is single ('-'), double ('='), or triple ('#'). We need to count the total number of bonds and the number of single bonds to calculate the percentage. The 'connected' table is also relevant because it links atoms to their respective bonds, allowing us to identify which atoms are involved in single bonds. The 'atom' table is necessary to ensure we are counting atoms correctly, but since we are primarily focused on bonds and their types, the 'bond' and 'connected' tables are the most critical for this query. Therefore, the selected tables are 'bond' and 'connected'.",
+        "selected_tables": [
+            "bond",
+            "connected"
+        ],
+        "tentative_schema": {
+            "bond": [
+                "bond_id",
+                "bond_type"
+            ],
+            "connected": [
+                "bond_id"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "bond": [
+                "bond_id",
+                "bond_type"
+            ]
+        },
+        "status": "success",
+        "execution_time": 1.9
+    },
+    {
+        "tool_name": "select_columns",
+        "chain_of_thought_reasoning": "To find the percentage of atoms with a single bond, we need to identify the bond type and the total number of bonds. The 'bond_type' column in the 'bond' table is essential for filtering the single bonds (indicated by '-') and calculating the sum. The 'bond_id' column is necessary to count the total number of bonds, as it serves as a unique identifier for each bond. Therefore, both columns are crucial for performing the calculations required to answer the question.",
+        "selected_columns": {
+            "bond": [
+                "bond_id",
+                "bond_type"
+            ]
+        },
+        "tentative_schema": {
+            "bond": [
+                "bond_id",
+                "bond_type"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "bond": [
+                "bond_id",
+                "bond_type"
+            ]
+        },
+        "status": "success",
+        "execution_time": 1.6
+    },
+    {
+        "tool_name": "generate_candidate",
+        "node_type": "generate_candidate",
+        "generation_based_candidates": [
+            {
+                "template_name": "generate_candidate_one",
+                "candidates": [
+                    " SELECT (SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END) / COUNT(bond_id)) * 100 AS percentage FROM bond "
+                ]
+            }
+        ],
+        "candidates": [
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT (SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END) / COUNT(bond_id)) * 100 AS percentage FROM bond ",
+                "plan": "**Question**: Find the percentage of atoms with single bond.  \n**Evidence**: single bond refers to bond_type = '-'; percentage = DIVIDE(SUM(bond_type = '-'), COUNT(bond_id)) as percentage\n\n**1. Divide and Conquer:**\n\n* **Main Question:** Find the percentage of atoms with single bond.\n    * **Analysis:** The question requires calculating the percentage of atoms that have a single bond. This involves counting the total number of bonds and counting how many of those are single bonds. We will use the `bond` table for this calculation.\n    * **Pseudo SQL:** SELECT (SUM(<single bond count>) / COUNT(<total bond count>)) * 100 AS percentage FROM bond\n\n    * **Sub-question 1:** single bond count\n        * **Analysis:** We need to count the number of bonds that are of type single, which is represented by `bond_type = '-'`.\n        * **Pseudo SQL:** SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END)\n\n    * **Sub-question 2:** total bond count\n        * **Analysis:** This is simply counting all the bonds in the `bond` table.\n        * **Pseudo SQL:** COUNT(bond_id)\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (single bond count):**\n    * **SQL:** SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END)\n\n* **Sub-question 2 (total bond count):**\n    * **SQL:** COUNT(bond_id)\n\n* **Main Question (percentage of single bonds):**\n    * **SQL:** SELECT (SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END) / COUNT(bond_id)) * 100 AS percentage FROM bond\n\n**3. Simplification and Optimization:**\n\n* The SQL query from step 2 is already efficient. We are directly calculating the percentage in a single query without the need for nested queries or additional joins.\n\n**Final Optimized SQL Query:**\n\n"
+            }
+        ],
+        "status": "success",
+        "execution_time": 5.0
+    },
+    {
+        "tool_name": "revise",
+        "original_SQL_id": "generate_candidate",
+        "refined_SQL_id": "revise_1",
+        "candidates": [
+            {
+                "refined_query": " SELECT (SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END) / COUNT(bond_id)) * 100 AS percentage FROM bond "
+            }
+        ],
+        "status": "success",
+        "execution_time": 0.1
+    },
+    {
+        "tool_name": "execution_accuracy",
+        "generate_candidate": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "Find the percentage of atoms with single bond.",
+            "Evidence": "single bond refers to bond_type = '-'; percentage = DIVIDE(SUM(bond_type = '-'), COUNT(bond_id)) as percentage",
+            "GOLD_SQL": "SELECT CAST(COUNT(CASE WHEN T.bond_type = '-' THEN T.bond_id ELSE NULL END) AS REAL) * 100 / COUNT(T.bond_id) FROM bond t",
+            "PREDICTED_SQL": " SELECT (SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END) / COUNT(bond_id)) * 100 AS percentage FROM bond "
+        },
+        "revise_1": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "Find the percentage of atoms with single bond.",
+            "Evidence": "single bond refers to bond_type = '-'; percentage = DIVIDE(SUM(bond_type = '-'), COUNT(bond_id)) as percentage",
+            "GOLD_SQL": "SELECT CAST(COUNT(CASE WHEN T.bond_type = '-' THEN T.bond_id ELSE NULL END) AS REAL) * 100 / COUNT(T.bond_id) FROM bond t",
+            "PREDICTED_SQL": " SELECT (SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END) / COUNT(bond_id)) * 100 AS percentage FROM bond "
+        },
+        "final_SQL": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "Find the percentage of atoms with single bond.",
+            "Evidence": "single bond refers to bond_type = '-'; percentage = DIVIDE(SUM(bond_type = '-'), COUNT(bond_id)) as percentage",
+            "GOLD_SQL": "SELECT CAST(COUNT(CASE WHEN T.bond_type = '-' THEN T.bond_id ELSE NULL END) AS REAL) * 100 / COUNT(T.bond_id) FROM bond t",
+            "PREDICTED_SQL": " SELECT (SUM(CASE WHEN bond_type = '-' THEN 1 ELSE 0 END) / COUNT(bond_id)) * 100 AS percentage FROM bond "
+        },
+        "status": "success",
+        "execution_time": 0.0
+    }
+]

@@ -1,0 +1,262 @@
+[
+    {
+        "tool_name": "extract_keywords",
+        "keywords": [
+            "stadiums",
+            "highest average attendance rates",
+            "lowest average attendance rates",
+            "Gayfield Park stadium",
+            "one-tenth capacity",
+            "Hampden Park stadium",
+            "concerts",
+            "attendance rate",
+            "attendance amount",
+            "capacity"
+        ],
+        "status": "success",
+        "execution_time": 1.3
+    },
+    {
+        "tool_name": "retrieve_entity",
+        "similar_columns": {
+            "stadium": [
+                "Average",
+                "Highest",
+                "Capacity",
+                "Lowest"
+            ]
+        },
+        "schema_with_examples": {
+            "stadium": {
+                "Name": [
+                    "Hampden Park",
+                    "Gayfield Park"
+                ]
+            }
+        },
+        "status": "success",
+        "execution_time": 3.3
+    },
+    {
+        "tool_name": "retrieve_context",
+        "schema_with_descriptions": {},
+        "status": "success",
+        "execution_time": 21.7
+    },
+    {
+        "tool_name": "filter_column",
+        "tentative_schema": {
+            "stadium": [
+                "Stadium_ID",
+                "Location",
+                "Name",
+                "Capacity",
+                "Lowest",
+                "Average",
+                "Highest"
+            ],
+            "singer": [],
+            "concert": [
+                "Stadium_ID"
+            ],
+            "singer_in_concert": []
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'stadium'.'Hampden Park'",
+            "'stadium'.'Gayfield Park'"
+        ],
+        "correct_columns": {
+            "stadium": [
+                "capacity",
+                "name",
+                "Hampden Park",
+                "stadium_id",
+                "average",
+                "Gayfield Park"
+            ],
+            "concert": [
+                "stadium_id"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.8
+    },
+    {
+        "tool_name": "select_tables",
+        "chain_of_thought_reasoning": "To answer the question about the names of the stadiums with the highest and lowest average attendance rates, we need to analyze the stadiums and their capacities. The 'stadium' table is essential as it contains the names and capacities of the stadiums. Additionally, we need to calculate the average attendance rates, which requires data on concert attendance. The 'concert' table is necessary to link concerts to stadiums, but we also need to know how many concerts have been held at each stadium, which can be derived from the 'singer_in_concert' table that connects singers to concerts. Therefore, the selected tables are 'stadium', 'concert', and 'singer_in_concert' to gather all necessary information for the query.",
+        "selected_tables": [
+            "stadium",
+            "concert",
+            "singer_in_concert"
+        ],
+        "tentative_schema": {
+            "stadium": [
+                "Stadium_ID",
+                "Location",
+                "Name",
+                "Capacity",
+                "Lowest",
+                "Average",
+                "Highest"
+            ],
+            "concert": [
+                "Stadium_ID"
+            ],
+            "singer_in_concert": []
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'stadium'.'Hampden Park'",
+            "'stadium'.'Gayfield Park'"
+        ],
+        "correct_columns": {
+            "stadium": [
+                "capacity",
+                "name",
+                "Hampden Park",
+                "stadium_id",
+                "average",
+                "Gayfield Park"
+            ],
+            "concert": [
+                "stadium_id"
+            ]
+        },
+        "status": "success",
+        "execution_time": 28.2
+    },
+    {
+        "tool_name": "select_columns",
+        "chain_of_thought_reasoning": "To answer the question, we need to identify the stadiums with the highest and lowest average attendance rates, which requires the 'Average' and 'Capacity' columns from the 'stadium' table. Additionally, we need to count the number of concerts held in each stadium, which necessitates the 'Stadium_ID' from the 'stadium' table and the 'concert_ID' from the 'concert' table to establish the relationship between concerts and stadiums. The 'Name' column from the 'stadium' table is also essential to retrieve the names of the stadiums.",
+        "selected_columns": {
+            "stadium": [
+                "Stadium_ID",
+                "Name",
+                "Average",
+                "Capacity"
+            ],
+            "concert": [
+                "concert_ID"
+            ]
+        },
+        "tentative_schema": {
+            "stadium": [
+                "Stadium_ID",
+                "Name",
+                "Average",
+                "Capacity"
+            ],
+            "concert": [
+                "concert_ID"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'stadium'.'Hampden Park'",
+            "'stadium'.'Gayfield Park'",
+            "'concert'.'stadium_id'"
+        ],
+        "correct_columns": {
+            "stadium": [
+                "capacity",
+                "name",
+                "Hampden Park",
+                "stadium_id",
+                "average",
+                "Gayfield Park"
+            ],
+            "concert": [
+                "stadium_id"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.6
+    },
+    {
+        "tool_name": "generate_candidate",
+        "node_type": "generate_candidate",
+        "generation_based_candidates": [
+            {
+                "template_name": "generate_candidate_one",
+                "candidates": [
+                    " SELECT T1.Name, COUNT(T2.concert_ID) AS Concert_Count  FROM stadium AS T1  LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE T1.Capacity = 10 * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park') OR T1.Name = 'Hampden Park'  GROUP BY T1.Name  HAVING AVG(T2.Attendance) = (SELECT MAX(AVG(T2.Attendance)) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID GROUP BY T1.Name)     OR AVG(T2.Attendance) = (SELECT MIN(AVG(T2.Attendance)) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID GROUP BY T1.Name); ",
+                    " SELECT T1.Name, COUNT(T2.concert_ID)  FROM stadium AS T1  LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE (SELECT Capacity FROM stadium WHERE Name = 'Gayfield Park') = (1/10) * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park') GROUP BY T1.Name  HAVING (T1.Average * 1.0 / T1.Capacity) IN (SELECT MAX(attendance_rate) FROM (SELECT (T1.Average * 1.0 / T1.Capacity) AS attendance_rate FROM stadium AS T1) UNION SELECT MIN(attendance_rate) FROM (SELECT (T1.Average * 1.0 / T1.Capacity) AS attendance_rate FROM stadium AS T1)) ",
+                    " WITH AttendanceRates AS (     SELECT T1.Name, SUM(T2.attendance) / T1.Capacity AS average_attendance_rate      FROM stadium AS T1      LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID      GROUP BY T1.Name ) SELECT T1.Name, COUNT(T2.concert_ID)  FROM stadium AS T1  LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE (SELECT Capacity FROM stadium WHERE Name = 'Gayfield Park') = 0.1 * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park')  AND T1.Name IN (SELECT Name FROM AttendanceRates WHERE average_attendance_rate = (SELECT MAX(average_attendance_rate) FROM AttendanceRates) OR average_attendance_rate = (SELECT MIN(average_attendance_rate) FROM AttendanceRates)) GROUP BY T1.Name "
+                ]
+            }
+        ],
+        "candidates": [
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT T1.Name, COUNT(T2.concert_ID) AS Concert_Count  FROM stadium AS T1  LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE T1.Capacity = 10 * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park') OR T1.Name = 'Hampden Park'  GROUP BY T1.Name  HAVING AVG(T2.Attendance) = (SELECT MAX(AVG(T2.Attendance)) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID GROUP BY T1.Name)     OR AVG(T2.Attendance) = (SELECT MIN(AVG(T2.Attendance)) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID GROUP BY T1.Name); ",
+                "plan": "**Question**: What are the names of the stadiums with the highest and lowest average attendance rates, if Gayfield Park stadium has one-tenth the capacity of Hampden Park stadium, and how many concerts have been held in each of them?  \n**Evidence**: Attendance rate is calculated by dividing attendance amount by the capacity of the stadium.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** What are the names of the stadiums with the highest and lowest average attendance rates, and how many concerts have been held in each of them?\n    * **Analysis:** We need to calculate the average attendance rate for each stadium, which is derived from the total attendance divided by the stadium's capacity. We will also need to count the number of concerts held in each stadium. The condition regarding Gayfield Park and Hampden Park will be used to filter the results.\n    * **Pseudo SQL:** SELECT `T1`.`Name`, COUNT(`T2`.`concert_ID`) FROM `stadium` AS `T1` LEFT JOIN `concert` AS `T2` ON `T1`.`Stadium_ID` = `T2`.`Stadium_ID` WHERE <conditions for highest and lowest attendance rates> GROUP BY `T1`.`Name`\n\n    * **Sub-question 1:** Calculate attendance rates\n        * **Analysis:** The attendance rate is calculated as the total attendance divided by the capacity. We need to join the `concert` table to get the total attendance for each stadium.\n        * **Pseudo SQL:** `Attendance Rate` = SUM(`T2`.`Attendance`) / `T1`.`Capacity`\n\n    * **Sub-question 2:** Conditions for Gayfield Park and Hampden Park\n        * **Analysis:** We need to ensure that Gayfield Park has one-tenth the capacity of Hampden Park. This can be expressed as a condition in the `WHERE` clause.\n        * **Pseudo SQL:** `T1`.`Capacity` = 10 * (SELECT `Capacity` FROM `stadium` WHERE `Name` = 'Hampden Park')\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (calculate attendance rates):**\n    * **SQL:** `SUM(T2.Attendance) / T1.Capacity AS Attendance_Rate`\n\n* **Sub-question 2 (conditions for Gayfield Park and Hampden Park):**\n    * **SQL:** `T1.Capacity = 10 * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park')`\n\n* **Main Question (names of stadiums and concert counts):**\n    * **SQL:** SELECT `T1`.`Name`, COUNT(`T2`.`concert_ID`) FROM `stadium` AS `T1` LEFT JOIN `concert` AS `T2` ON `T1`.`Stadium_ID` = `T2`.`Stadium_ID` WHERE `T1`.`Capacity` = 10 * (SELECT `Capacity` FROM `stadium` WHERE `Name` = 'Hampden Park') OR `T1`.`Name` = 'Hampden Park' GROUP BY `T1`.`Name`\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by calculating the average attendance rates directly in the main query and filtering for the highest and lowest rates using a `HAVING` clause.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT T1.Name, COUNT(T2.concert_ID)  FROM stadium AS T1  LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE (SELECT Capacity FROM stadium WHERE Name = 'Gayfield Park') = (1/10) * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park') GROUP BY T1.Name  HAVING (T1.Average * 1.0 / T1.Capacity) IN (SELECT MAX(attendance_rate) FROM (SELECT (T1.Average * 1.0 / T1.Capacity) AS attendance_rate FROM stadium AS T1) UNION SELECT MIN(attendance_rate) FROM (SELECT (T1.Average * 1.0 / T1.Capacity) AS attendance_rate FROM stadium AS T1)) ",
+                "plan": "**Question**: What are the names of the stadiums with the highest and lowest average attendance rates, if Gayfield Park stadium has one-tenth the capacity of Hampden Park stadium, and how many concerts have been held in each of them?  \n**Evidence**: Attendance rate is calculated by dividing attendance amount by the capacity of the stadium.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** What are the names of the stadiums with the highest and lowest average attendance rates, and how many concerts have been held in each of them?\n    * **Analysis:** We need to calculate the average attendance rate for each stadium, which is derived from the attendance amount divided by the capacity. We also need to filter based on the condition that Gayfield Park has one-tenth the capacity of Hampden Park. Finally, we will count the number of concerts held in each stadium.\n    * **Pseudo SQL:** \n    ```sql\n    SELECT T1.Name, COUNT(T2.concert_ID) \n    FROM stadium AS T1 \n    LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID \n    WHERE <condition for highest and lowest average attendance rates> \n    GROUP BY T1.Name\n    ```\n\n    * **Sub-question 1:** Calculate average attendance rates for each stadium.\n        * **Analysis:** The average attendance rate can be calculated as `Average / Capacity`. We will need to include this calculation in our selection.\n        * **Pseudo SQL:** \n        ```sql\n        SELECT T1.Name, (T1.Average * 1.0 / T1.Capacity) AS attendance_rate \n        FROM stadium AS T1\n        ```\n\n    * **Sub-question 2:** Identify the condition for Gayfield Park and Hampden Park.\n        * **Analysis:** We need to ensure that the capacity of Gayfield Park is one-tenth that of Hampden Park. This can be expressed as:\n        ```sql\n        (SELECT Capacity FROM stadium WHERE Name = 'Gayfield Park') = (1/10) * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park')\n        ```\n        * **Pseudo SQL:** \n        ```sql\n        (SELECT Capacity FROM stadium WHERE Name = 'Gayfield Park') = (1/10) * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park')\n        ```\n\n    * **Sub-question 3:** Get the highest and lowest average attendance rates.\n        * **Analysis:** We can use the `ORDER BY` clause to sort the attendance rates and then limit the results to the highest and lowest.\n        * **Pseudo SQL:** \n        ```sql\n        ORDER BY attendance_rate DESC LIMIT 1 UNION ALL \n        SELECT * FROM (SELECT T1.Name, (T1.Average * 1.0 / T1.Capacity) AS attendance_rate \n        FROM stadium AS T1) ORDER BY attendance_rate ASC LIMIT 1\n        ```\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (average attendance rates):**\n    * **SQL:** \n    ```sql\n    SELECT T1.Name, (T1.Average * 1.0 / T1.Capacity) AS attendance_rate \n    FROM stadium AS T1\n    ```\n\n* **Sub-question 2 (condition for Gayfield Park and Hampden Park):**\n    * **SQL:** \n    ```sql\n    (SELECT Capacity FROM stadium WHERE Name = 'Gayfield Park') = (1/10) * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park')\n    ```\n\n* **Sub-question 3 (highest and lowest average attendance rates):**\n    * **SQL:** \n    ```sql\n    SELECT T1.Name, COUNT(T2.concert_ID) \n    FROM stadium AS T1 \n    LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID \n    WHERE (SELECT Capacity FROM stadium WHERE Name = 'Gayfield Park') = (1/10) * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park')\n    GROUP BY T1.Name \n    ORDER BY (T1.Average * 1.0 / T1.Capacity) DESC LIMIT 1 \n    UNION ALL \n    SELECT T1.Name, COUNT(T2.concert_ID) \n    FROM stadium AS T1 \n    LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID \n    WHERE (SELECT Capacity FROM stadium WHERE Name = 'Gayfield Park') = (1/10) * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park')\n    GROUP BY T1.Name \n    ORDER BY (T1.Average * 1.0 / T1.Capacity) ASC LIMIT 1\n    ```\n\n* **Main Question (final query):**\n    * **SQL:** \n    ```sql\n    SELECT T1.Name, COUNT(T2.concert_ID) \n    FROM stadium AS T1 \n    LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID \n    WHERE (SELECT Capacity FROM stadium WHERE Name = 'Gayfield Park') = (1/10) * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park')\n    GROUP BY T1.Name \n    HAVING (T1.Average * 1.0 / T1.Capacity) IN (SELECT MAX(attendance_rate) FROM (SELECT (T1.Average * 1.0 / T1.Capacity) AS attendance_rate FROM stadium AS T1) UNION SELECT MIN(attendance_rate) FROM (SELECT (T1.Average * 1.0 / T1.Capacity) AS attendance_rate FROM stadium AS T1))\n    ```\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by combining the calculations and conditions into a single query without the need for multiple sub-queries.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " WITH AttendanceRates AS (     SELECT T1.Name, SUM(T2.attendance) / T1.Capacity AS average_attendance_rate      FROM stadium AS T1      LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID      GROUP BY T1.Name ) SELECT T1.Name, COUNT(T2.concert_ID)  FROM stadium AS T1  LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE (SELECT Capacity FROM stadium WHERE Name = 'Gayfield Park') = 0.1 * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park')  AND T1.Name IN (SELECT Name FROM AttendanceRates WHERE average_attendance_rate = (SELECT MAX(average_attendance_rate) FROM AttendanceRates) OR average_attendance_rate = (SELECT MIN(average_attendance_rate) FROM AttendanceRates)) GROUP BY T1.Name ",
+                "plan": "**Question**: What are the names of the stadiums with the highest and lowest average attendance rates, if Gayfield Park stadium has one-tenth the capacity of Hampden Park stadium, and how many concerts have been held in each of them?  \n**Evidence**: Attendance rate is calculated by dividing attendance amount by the capacity of the stadium.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** What are the names of the stadiums with the highest and lowest average attendance rates, and how many concerts have been held in each of them?\n    * **Analysis:** We need to calculate the average attendance rate for each stadium, which is defined as the total attendance divided by the capacity. We also need to filter the stadiums based on the condition that Gayfield Park has one-tenth the capacity of Hampden Park. Finally, we will count the number of concerts held in each stadium.\n    * **Pseudo SQL:** \n    ```sql\n    SELECT T1.Name, COUNT(T2.concert_ID) \n    FROM stadium AS T1 \n    LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID \n    WHERE <condition for highest and lowest average attendance rates> \n    GROUP BY T1.Name\n    ```\n\n    * **Sub-question 1:** Calculate average attendance rate for each stadium.\n        * **Analysis:** The average attendance rate can be calculated as the total attendance divided by the capacity. We need to join the `stadium` and `concert` tables to get the attendance data.\n        * **Pseudo SQL:** \n        ```sql\n        SELECT T1.Name, SUM(T2.attendance) / T1.Capacity AS average_attendance_rate \n        FROM stadium AS T1 \n        LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID \n        GROUP BY T1.Name\n        ```\n\n    * **Sub-question 2:** Filter stadiums based on the condition that Gayfield Park has one-tenth the capacity of Hampden Park.\n        * **Analysis:** We need to find the capacities of both stadiums and apply the condition.\n        * **Pseudo SQL:** \n        ```sql\n        (SELECT Capacity FROM stadium WHERE Name = 'Gayfield Park') = 0.1 * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park')\n        ```\n\n    * **Sub-question 3:** Identify the highest and lowest average attendance rates.\n        * **Analysis:** We can use the results from Sub-question 1 to find the maximum and minimum average attendance rates.\n        * **Pseudo SQL:** \n        ```sql\n        SELECT MAX(average_attendance_rate), MIN(average_attendance_rate) FROM (previous sub-query)\n        ```\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (average attendance rate):**\n    * **SQL:** \n    ```sql\n    SELECT T1.Name, SUM(T2.attendance) / T1.Capacity AS average_attendance_rate \n    FROM stadium AS T1 \n    LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID \n    GROUP BY T1.Name\n    ```\n\n* **Sub-question 2 (condition for Gayfield Park and Hampden Park):**\n    * **SQL:** \n    ```sql\n    (SELECT Capacity FROM stadium WHERE Name = 'Gayfield Park') = 0.1 * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park')\n    ```\n\n* **Sub-question 3 (highest and lowest average attendance rates):**\n    * **SQL:** \n    ```sql\n    SELECT MAX(average_attendance_rate), MIN(average_attendance_rate) FROM (previous sub-query)\n    ```\n\n* **Main Question (names of stadiums and concert counts):**\n    * **SQL:** \n    ```sql\n    SELECT T1.Name, COUNT(T2.concert_ID) \n    FROM stadium AS T1 \n    LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID \n    WHERE (SELECT Capacity FROM stadium WHERE Name = 'Gayfield Park') = 0.1 * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park') \n    AND T1.Name IN (SELECT Name FROM (SELECT T1.Name, SUM(T2.attendance) / T1.Capacity AS average_attendance_rate \n    FROM stadium AS T1 \n    LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID \n    GROUP BY T1.Name) AS rates WHERE average_attendance_rate = (SELECT MAX(average_attendance_rate) FROM (previous sub-query)) OR average_attendance_rate = (SELECT MIN(average_attendance_rate) FROM (previous sub-query)))\n    GROUP BY T1.Name\n    ```\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by combining the calculations and conditions into a single query with a `WITH` clause for better readability and performance.\n\n**Final Optimized SQL Query:**\n\n"
+            }
+        ],
+        "status": "success",
+        "execution_time": 13.4
+    },
+    {
+        "tool_name": "revise",
+        "original_SQL_id": "generate_candidate",
+        "refined_SQL_id": "revise_1",
+        "candidates": [
+            {
+                "refined_query": " SELECT T1.Name, COUNT(T2.concert_ID) AS Concert_Count FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID WHERE T1.Capacity = 10 * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park') OR T1.Name = 'Hampden Park' GROUP BY T1.Name HAVING COUNT(T2.concert_ID) / T1.Capacity = (SELECT MAX(COUNT(T2.concert_ID)) / T1.Capacity FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID GROUP BY T1.Name) OR COUNT(T2.concert_ID) / T1.Capacity = (SELECT MIN(COUNT(T2.concert_ID)) / T1.Capacity FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID GROUP BY T1.Name); "
+            },
+            {
+                "refined_query": " SELECT T1.Name, COUNT(T2.concert_ID) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID WHERE (SELECT Capacity FROM stadium WHERE Name = 'Gayfield Park') = (1/10) * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park') AND T1.Average * 1.0 / T1.Capacity IN (SELECT MAX(attendance_rate) FROM (SELECT (Average * 1.0 / Capacity) AS attendance_rate FROM stadium) AS rates UNION SELECT MIN(attendance_rate) FROM (SELECT (Average * 1.0 / Capacity) AS attendance_rate FROM stadium) AS rates) GROUP BY T1.Name "
+            },
+            {
+                "refined_query": " SELECT T1.Name, COUNT(T2.concert_ID) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID WHERE T1.Name IN ('Gayfield Park', 'Hampden Park') AND (SELECT Capacity FROM stadium WHERE Name = 'Gayfield Park') = 0.1 * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park') GROUP BY T1.Name "
+            }
+        ],
+        "status": "success",
+        "execution_time": 10.9
+    },
+    {
+        "tool_name": "execution_accuracy",
+        "generate_candidate": {
+            "exec_res": 0,
+            "exec_err": "no such column: T2.Attendance",
+            "Question": "What are the names of the stadiums with the highest and lowest average attendance rates, if Gayfield Park stadium has one-tenth the capacity of Hampden Park stadium, and how many concerts have been held in each of them?",
+            "Evidence": "Attendance rate is calculated by divding attendance amount by the capacity of the stadium.",
+            "GOLD_SQL": "SELECT * FROM ( SELECT Name AS highest_name FROM ( SELECT Stadium_ID , Name , ( SELECT Capacity FROM stadium WHERE Name = \"Hampden Park\" ) / 10 AS Capacity , Average FROM stadium WHERE Name = \"Gayfield Park\" UNION ALL SELECt Stadium_ID , Name , Capacity , Average FROM stadium WHERE Name != \"Gayfield Park\" ) GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity DESC LIMIT 1 ) JOIN ( SELECT COUNT ( * ) AS concerts_in_highest_stadium FROM stadium A JOIN concert B ON A.Stadium_ID = B.Stadium_ID WHERE A.Stadium_ID = ( SELECT Stadium_ID FROM ( SELECT Stadium_ID , Name , ( SELECT Capacity FROM stadium WHERE Name = \"Hampden Park\" ) / 10 AS Capacity , Average FROM stadium WHERE Name = \"Gayfield Park\" UNION ALL SELECt Stadium_ID , Name , Capacity , Average FROM stadium WHERE Name != \"Gayfield Park\" ) GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity DESC LIMIT 1 ) ) JOIN ( SELECT Name AS lowest_name FROM ( SELECT Stadium_ID , Name , ( SELECT Capacity FROM stadium WHERE Name = \"Hampden Park\" ) / 10 AS Capacity , Average FROM stadium WHERE Name = \"Gayfield Park\" UNION ALL SELECt Stadium_ID , Name , Capacity , Average FROM stadium WHERE Name != \"Gayfield Park\" ) GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity ASC LIMIT 1 ) JOIN ( SELECT COUNT ( * ) AS concerts_in_lowest_stadium FROM stadium A JOIN concert B ON A.Stadium_ID = B.Stadium_ID WHERE A.Stadium_ID = ( SELECT Stadium_ID FROM ( SELECT Stadium_ID , Name , ( SELECT Capacity FROM stadium WHERE Name = \"Hampden Park\" ) / 10 AS Capacity , Average FROM stadium WHERE Name = \"Gayfield Park\" UNION ALL SELECt Stadium_ID , Name , Capacity , Average FROM stadium WHERE Name != \"Gayfield Park\" ) GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity ASC LIMIT 1 ) )",
+            "PREDICTED_SQL": " SELECT T1.Name, COUNT(T2.concert_ID) AS Concert_Count  FROM stadium AS T1  LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE T1.Capacity = 10 * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park') OR T1.Name = 'Hampden Park'  GROUP BY T1.Name  HAVING AVG(T2.Attendance) = (SELECT MAX(AVG(T2.Attendance)) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID GROUP BY T1.Name)     OR AVG(T2.Attendance) = (SELECT MIN(AVG(T2.Attendance)) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID GROUP BY T1.Name); "
+        },
+        "revise_1": {
+            "exec_res": 0,
+            "exec_err": "misuse of aggregate function COUNT()",
+            "Question": "What are the names of the stadiums with the highest and lowest average attendance rates, if Gayfield Park stadium has one-tenth the capacity of Hampden Park stadium, and how many concerts have been held in each of them?",
+            "Evidence": "Attendance rate is calculated by divding attendance amount by the capacity of the stadium.",
+            "GOLD_SQL": "SELECT * FROM ( SELECT Name AS highest_name FROM ( SELECT Stadium_ID , Name , ( SELECT Capacity FROM stadium WHERE Name = \"Hampden Park\" ) / 10 AS Capacity , Average FROM stadium WHERE Name = \"Gayfield Park\" UNION ALL SELECt Stadium_ID , Name , Capacity , Average FROM stadium WHERE Name != \"Gayfield Park\" ) GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity DESC LIMIT 1 ) JOIN ( SELECT COUNT ( * ) AS concerts_in_highest_stadium FROM stadium A JOIN concert B ON A.Stadium_ID = B.Stadium_ID WHERE A.Stadium_ID = ( SELECT Stadium_ID FROM ( SELECT Stadium_ID , Name , ( SELECT Capacity FROM stadium WHERE Name = \"Hampden Park\" ) / 10 AS Capacity , Average FROM stadium WHERE Name = \"Gayfield Park\" UNION ALL SELECt Stadium_ID , Name , Capacity , Average FROM stadium WHERE Name != \"Gayfield Park\" ) GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity DESC LIMIT 1 ) ) JOIN ( SELECT Name AS lowest_name FROM ( SELECT Stadium_ID , Name , ( SELECT Capacity FROM stadium WHERE Name = \"Hampden Park\" ) / 10 AS Capacity , Average FROM stadium WHERE Name = \"Gayfield Park\" UNION ALL SELECt Stadium_ID , Name , Capacity , Average FROM stadium WHERE Name != \"Gayfield Park\" ) GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity ASC LIMIT 1 ) JOIN ( SELECT COUNT ( * ) AS concerts_in_lowest_stadium FROM stadium A JOIN concert B ON A.Stadium_ID = B.Stadium_ID WHERE A.Stadium_ID = ( SELECT Stadium_ID FROM ( SELECT Stadium_ID , Name , ( SELECT Capacity FROM stadium WHERE Name = \"Hampden Park\" ) / 10 AS Capacity , Average FROM stadium WHERE Name = \"Gayfield Park\" UNION ALL SELECt Stadium_ID , Name , Capacity , Average FROM stadium WHERE Name != \"Gayfield Park\" ) GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity ASC LIMIT 1 ) )",
+            "PREDICTED_SQL": " SELECT T1.Name, COUNT(T2.concert_ID) AS Concert_Count FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID WHERE T1.Capacity = 10 * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park') OR T1.Name = 'Hampden Park' GROUP BY T1.Name HAVING COUNT(T2.concert_ID) / T1.Capacity = (SELECT MAX(COUNT(T2.concert_ID)) / T1.Capacity FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID GROUP BY T1.Name) OR COUNT(T2.concert_ID) / T1.Capacity = (SELECT MIN(COUNT(T2.concert_ID)) / T1.Capacity FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID GROUP BY T1.Name); "
+        },
+        "final_SQL": {
+            "exec_res": 0,
+            "exec_err": "misuse of aggregate function COUNT()",
+            "Question": "What are the names of the stadiums with the highest and lowest average attendance rates, if Gayfield Park stadium has one-tenth the capacity of Hampden Park stadium, and how many concerts have been held in each of them?",
+            "Evidence": "Attendance rate is calculated by divding attendance amount by the capacity of the stadium.",
+            "GOLD_SQL": "SELECT * FROM ( SELECT Name AS highest_name FROM ( SELECT Stadium_ID , Name , ( SELECT Capacity FROM stadium WHERE Name = \"Hampden Park\" ) / 10 AS Capacity , Average FROM stadium WHERE Name = \"Gayfield Park\" UNION ALL SELECt Stadium_ID , Name , Capacity , Average FROM stadium WHERE Name != \"Gayfield Park\" ) GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity DESC LIMIT 1 ) JOIN ( SELECT COUNT ( * ) AS concerts_in_highest_stadium FROM stadium A JOIN concert B ON A.Stadium_ID = B.Stadium_ID WHERE A.Stadium_ID = ( SELECT Stadium_ID FROM ( SELECT Stadium_ID , Name , ( SELECT Capacity FROM stadium WHERE Name = \"Hampden Park\" ) / 10 AS Capacity , Average FROM stadium WHERE Name = \"Gayfield Park\" UNION ALL SELECt Stadium_ID , Name , Capacity , Average FROM stadium WHERE Name != \"Gayfield Park\" ) GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity DESC LIMIT 1 ) ) JOIN ( SELECT Name AS lowest_name FROM ( SELECT Stadium_ID , Name , ( SELECT Capacity FROM stadium WHERE Name = \"Hampden Park\" ) / 10 AS Capacity , Average FROM stadium WHERE Name = \"Gayfield Park\" UNION ALL SELECt Stadium_ID , Name , Capacity , Average FROM stadium WHERE Name != \"Gayfield Park\" ) GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity ASC LIMIT 1 ) JOIN ( SELECT COUNT ( * ) AS concerts_in_lowest_stadium FROM stadium A JOIN concert B ON A.Stadium_ID = B.Stadium_ID WHERE A.Stadium_ID = ( SELECT Stadium_ID FROM ( SELECT Stadium_ID , Name , ( SELECT Capacity FROM stadium WHERE Name = \"Hampden Park\" ) / 10 AS Capacity , Average FROM stadium WHERE Name = \"Gayfield Park\" UNION ALL SELECt Stadium_ID , Name , Capacity , Average FROM stadium WHERE Name != \"Gayfield Park\" ) GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity ASC LIMIT 1 ) )",
+            "PREDICTED_SQL": " SELECT T1.Name, COUNT(T2.concert_ID) AS Concert_Count FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID WHERE T1.Capacity = 10 * (SELECT Capacity FROM stadium WHERE Name = 'Hampden Park') OR T1.Name = 'Hampden Park' GROUP BY T1.Name HAVING COUNT(T2.concert_ID) / T1.Capacity = (SELECT MAX(COUNT(T2.concert_ID)) / T1.Capacity FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID GROUP BY T1.Name) OR COUNT(T2.concert_ID) / T1.Capacity = (SELECT MIN(COUNT(T2.concert_ID)) / T1.Capacity FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID GROUP BY T1.Name); "
+        },
+        "status": "success",
+        "execution_time": 0.0
+    }
+]

@@ -1,0 +1,246 @@
+[
+    {
+        "tool_name": "extract_keywords",
+        "keywords": [
+            "chemical compounds",
+            "molecule TR047",
+            "double-bond",
+            "bond_type",
+            "TR047",
+            "bond_type = ' = '",
+            "percentage",
+            "DIVIDE(SUM(bond_type = ' = '), COUNT(all bond_id))",
+            "molecule_id"
+        ],
+        "status": "success",
+        "execution_time": 1.1
+    },
+    {
+        "tool_name": "retrieve_entity",
+        "similar_columns": {
+            "bond": [
+                "bond_type",
+                "molecule_id"
+            ],
+            "atom": [
+                "molecule_id"
+            ],
+            "molecule": [
+                "molecule_id"
+            ]
+        },
+        "schema_with_examples": {},
+        "status": "success",
+        "execution_time": 1.2
+    },
+    {
+        "tool_name": "retrieve_context",
+        "schema_with_descriptions": {
+            "bond": {
+                "molecule_id": {
+                    "column_name": "",
+                    "column_description": "identifying the molecule in which the bond appears",
+                    "value_description": ""
+                },
+                "bond_id": {
+                    "column_name": "",
+                    "column_description": "unique id representing bonds",
+                    "value_description": "TRxxx_A1_A2: TRXXX refers to which molecule A1 and A2 refers to which atom"
+                },
+                "bond_type": {
+                    "column_name": "",
+                    "column_description": "type of the bond",
+                    "value_description": "\u0093-\u0094: single bond '=': double bond '#': triple bond"
+                }
+            },
+            "atom": {
+                "molecule_id": {
+                    "column_name": "molecule id",
+                    "column_description": "identifying the molecule to which the atom belongs",
+                    "value_description": "TRXXX_i represents ith atom of molecule TRXXX"
+                }
+            },
+            "molecule": {
+                "molecule_id": {
+                    "column_name": "molecule id",
+                    "column_description": "unique id of molecule",
+                    "value_description": "\"+\" --> this molecule / compound is carcinogenic '-' this molecule is not / compound carcinogenic"
+                }
+            },
+            "connected": {
+                "bond_id": {
+                    "column_name": "bond id",
+                    "column_description": "bond id representing bond between two atoms",
+                    "value_description": ""
+                }
+            }
+        },
+        "status": "success",
+        "execution_time": 9.6
+    },
+    {
+        "tool_name": "filter_column",
+        "tentative_schema": {
+            "atom": [
+                "molecule_id"
+            ],
+            "bond": [
+                "bond_id",
+                "molecule_id",
+                "bond_type"
+            ],
+            "connected": [
+                "bond_id"
+            ],
+            "molecule": [
+                "molecule_id"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "bond": [
+                "molecule_id",
+                "bond_id",
+                "bond_type"
+            ]
+        },
+        "status": "success",
+        "execution_time": 1.9
+    },
+    {
+        "tool_name": "select_tables",
+        "chain_of_thought_reasoning": "To answer the question about the percentage of double bonds in the chemical compound with molecule_id 'TR047', we need to analyze the relationships between molecules, bonds, and atoms. The 'bond' table is essential because it contains the bond_type information, which allows us to identify double bonds. The 'molecule' table is necessary to filter for the specific molecule_id 'TR047'. The 'connected' table is not needed directly for this query since we are only interested in the bond types associated with the specified molecule. Therefore, the relevant tables are 'bond' and 'molecule'.",
+        "selected_tables": [
+            "bond",
+            "molecule"
+        ],
+        "tentative_schema": {
+            "bond": [
+                "bond_id",
+                "molecule_id",
+                "bond_type"
+            ],
+            "molecule": [
+                "molecule_id"
+            ],
+            "atom": [
+                "molecule_id"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "bond": [
+                "molecule_id",
+                "bond_id",
+                "bond_type"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.0
+    },
+    {
+        "tool_name": "select_columns",
+        "chain_of_thought_reasoning": "To answer the question about the percentage of double bonds in the molecule TR047, we need to filter by the molecule_id and analyze the bond_type. The molecule_id is essential to identify the specific molecule, and the bond_type is necessary to determine which bonds are double bonds. Additionally, we need the bond_id to count all bonds associated with the molecule.",
+        "selected_columns": {
+            "molecule": [
+                "molecule_id"
+            ],
+            "bond": [
+                "molecule_id",
+                "bond_type",
+                "bond_id"
+            ]
+        },
+        "tentative_schema": {
+            "molecule": [
+                "molecule_id"
+            ],
+            "bond": [
+                "molecule_id",
+                "bond_type",
+                "bond_id"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "bond": [
+                "molecule_id",
+                "bond_id",
+                "bond_type"
+            ]
+        },
+        "status": "success",
+        "execution_time": 1.7
+    },
+    {
+        "tool_name": "generate_candidate",
+        "node_type": "generate_candidate",
+        "generation_based_candidates": [
+            {
+                "template_name": "generate_candidate_one",
+                "candidates": [
+                    " SELECT (SUM(CASE WHEN bond_type = ' = ' THEN 1 ELSE 0 END) * 100.0 / COUNT(bond_id)) AS percent FROM bond WHERE molecule_id = 'TR047' "
+                ]
+            }
+        ],
+        "candidates": [
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT (SUM(CASE WHEN bond_type = ' = ' THEN 1 ELSE 0 END) * 100.0 / COUNT(bond_id)) AS percent FROM bond WHERE molecule_id = 'TR047' ",
+                "plan": "**Question**: Among all chemical compounds that contain molecule TR047, identify the percent that form a double-bond.  \n**Evidence**: TR047 is the molecule id; double bond refers to bond_type = ' = '; percentage = DIVIDE(SUM(bond_type = ' = '), COUNT(all bond_id)) as percent where molecule_id = 'TR047'\n\n**1. Divide and Conquer:**\n\n* **Main Question:** Among all chemical compounds that contain molecule TR047, identify the percent that form a double-bond.\n    * **Analysis:** We need to calculate the percentage of bonds that are double-bonds for the specified molecule. This involves counting the total number of bonds and the number of double-bonds for the molecule with ID 'TR047'.\n    * **Pseudo SQL:** SELECT DIVIDE(SUM(<double bond condition>), COUNT(<all bonds condition>)) AS percent FROM `bond` WHERE <molecule_id = 'TR047'>\n\n    * **Sub-question 1:** double bond condition\n        * **Analysis:** This condition checks if the bond type is a double bond.\n        * **Pseudo SQL:** `bond_type = ' = '`\n\n    * **Sub-question 2:** all bonds condition\n        * **Analysis:** This condition counts all bonds for the specified molecule.\n        * **Pseudo SQL:** `bond_id IS NOT NULL`\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (double bond condition):**\n    * **SQL:** `bond_type = ' = '`\n\n* **Sub-question 2 (all bonds condition):**\n    * **SQL:** `bond_id IS NOT NULL`\n\n* **Main Question (percentage of double bonds):**\n    * **SQL:** SELECT DIVIDE(SUM(CASE WHEN bond_type = ' = ' THEN 1 ELSE 0 END), COUNT(bond_id)) AS percent FROM bond WHERE molecule_id = 'TR047'\n\n**3. Simplification and Optimization:**\n\n* The SQL query from step 2 is already efficient. We are using a conditional aggregation to count double bonds and total bonds in a single query.\n\n**Final Optimized SQL Query:**\n\n"
+            }
+        ],
+        "status": "success",
+        "execution_time": 4.5
+    },
+    {
+        "tool_name": "revise",
+        "original_SQL_id": "generate_candidate",
+        "refined_SQL_id": "revise_1",
+        "candidates": [
+            {
+                "refined_query": " SELECT (SUM(CASE WHEN bond_type = ' = ' THEN 1 ELSE 0 END) * 100.0 / COUNT(bond_id)) AS percent FROM bond WHERE molecule_id = 'TR047' "
+            }
+        ],
+        "status": "success",
+        "execution_time": 0.1
+    },
+    {
+        "tool_name": "execution_accuracy",
+        "generate_candidate": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "Among all chemical compounds that contain molecule TR047, identify the percent that form a double-bond.",
+            "Evidence": "TR047 is the molecule id; double bond refers to bond_type = ' = '; percentage = DIVIDE(SUM(bond_type = ' = '), COUNT(all bond_id)) as percent where molecule_id = 'TR047'",
+            "GOLD_SQL": "SELECT CAST(COUNT(CASE WHEN T.bond_type = '=' THEN T.bond_id ELSE NULL END) AS REAL) * 100 / COUNT(T.bond_id) FROM bond AS T WHERE T.molecule_id = 'TR047'",
+            "PREDICTED_SQL": " SELECT (SUM(CASE WHEN bond_type = ' = ' THEN 1 ELSE 0 END) * 100.0 / COUNT(bond_id)) AS percent FROM bond WHERE molecule_id = 'TR047' "
+        },
+        "revise_1": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "Among all chemical compounds that contain molecule TR047, identify the percent that form a double-bond.",
+            "Evidence": "TR047 is the molecule id; double bond refers to bond_type = ' = '; percentage = DIVIDE(SUM(bond_type = ' = '), COUNT(all bond_id)) as percent where molecule_id = 'TR047'",
+            "GOLD_SQL": "SELECT CAST(COUNT(CASE WHEN T.bond_type = '=' THEN T.bond_id ELSE NULL END) AS REAL) * 100 / COUNT(T.bond_id) FROM bond AS T WHERE T.molecule_id = 'TR047'",
+            "PREDICTED_SQL": " SELECT (SUM(CASE WHEN bond_type = ' = ' THEN 1 ELSE 0 END) * 100.0 / COUNT(bond_id)) AS percent FROM bond WHERE molecule_id = 'TR047' "
+        },
+        "final_SQL": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "Among all chemical compounds that contain molecule TR047, identify the percent that form a double-bond.",
+            "Evidence": "TR047 is the molecule id; double bond refers to bond_type = ' = '; percentage = DIVIDE(SUM(bond_type = ' = '), COUNT(all bond_id)) as percent where molecule_id = 'TR047'",
+            "GOLD_SQL": "SELECT CAST(COUNT(CASE WHEN T.bond_type = '=' THEN T.bond_id ELSE NULL END) AS REAL) * 100 / COUNT(T.bond_id) FROM bond AS T WHERE T.molecule_id = 'TR047'",
+            "PREDICTED_SQL": " SELECT (SUM(CASE WHEN bond_type = ' = ' THEN 1 ELSE 0 END) * 100.0 / COUNT(bond_id)) AS percent FROM bond WHERE molecule_id = 'TR047' "
+        },
+        "status": "success",
+        "execution_time": 0.0
+    }
+]

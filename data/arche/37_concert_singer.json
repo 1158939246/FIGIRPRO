@@ -1,0 +1,246 @@
+[
+    {
+        "tool_name": "extract_keywords",
+        "keywords": [
+            "stadium",
+            "three times",
+            "singers",
+            "Glebe Park"
+        ],
+        "status": "success",
+        "execution_time": 1.0
+    },
+    {
+        "tool_name": "retrieve_entity",
+        "similar_columns": {},
+        "schema_with_examples": {
+            "stadium": {
+                "Name": [
+                    "Glebe Park"
+                ]
+            }
+        },
+        "status": "success",
+        "execution_time": 2.7
+    },
+    {
+        "tool_name": "retrieve_context",
+        "schema_with_descriptions": {},
+        "status": "success",
+        "execution_time": 6.8
+    },
+    {
+        "tool_name": "filter_column",
+        "tentative_schema": {
+            "stadium": [
+                "Name"
+            ],
+            "singer": [],
+            "concert": [
+                "Stadium_ID"
+            ],
+            "singer_in_concert": []
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'concert'.'concert_id'",
+            "'singer_in_concert'.'concert_id'",
+            "'singer_in_concert'.'singer_id'",
+            "'stadium'.'stadium_id'"
+        ],
+        "correct_columns": {
+            "concert": [
+                "concert_id",
+                "stadium_id"
+            ],
+            "singer_in_concert": [
+                "concert_id",
+                "singer_id"
+            ],
+            "stadium": [
+                "stadium_id",
+                "name"
+            ]
+        },
+        "status": "success",
+        "execution_time": 6.5
+    },
+    {
+        "tool_name": "select_tables",
+        "chain_of_thought_reasoning": "To answer the question about which stadium has had a minimum of three times more singers than Glebe Park, we need to analyze the relationships between singers, concerts, and stadiums. The 'singer' table is necessary to count the number of singers. The 'singer_in_concert' table is essential to link singers to their respective concerts, which in turn connects to the 'concert' table. The 'concert' table is required to associate concerts with stadiums. Finally, the 'stadium' table is needed to identify the specific stadiums and to compare the number of singers associated with Glebe Park to other stadiums. Therefore, all four tables are necessary to construct the SQL query that answers the question.",
+        "selected_tables": [
+            "singer",
+            "singer_in_concert",
+            "concert",
+            "stadium"
+        ],
+        "tentative_schema": {
+            "singer": [],
+            "singer_in_concert": [],
+            "concert": [
+                "Stadium_ID"
+            ],
+            "stadium": [
+                "Name"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'concert'.'concert_id'",
+            "'singer_in_concert'.'concert_id'",
+            "'singer_in_concert'.'singer_id'",
+            "'stadium'.'stadium_id'"
+        ],
+        "correct_columns": {
+            "concert": [
+                "concert_id",
+                "stadium_id"
+            ],
+            "singer_in_concert": [
+                "concert_id",
+                "singer_id"
+            ],
+            "stadium": [
+                "stadium_id",
+                "name"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.4
+    },
+    {
+        "tool_name": "select_columns",
+        "chain_of_thought_reasoning": "To determine which stadium has had a minimum of three times more singers than Glebe Park, we need to identify the relevant columns that allow us to count the number of singers associated with each stadium and compare that count to the number of singers associated with Glebe Park. The 'stadium' table provides the name of the stadium, while the 'concert' and 'singer_in_concert' tables allow us to link concerts to singers and stadiums. Specifically, we need the 'Stadium_ID' from the 'stadium' table to identify the stadiums, the 'Stadium_ID' from the 'concert' table to associate concerts with stadiums, and the 'Singer_ID' from the 'singer_in_concert' table to count the number of singers per stadium. Additionally, we need to filter by the name of the stadium ('Glebe Park') to establish the comparison.",
+        "selected_columns": {
+            "stadium": [
+                "Stadium_ID",
+                "Name"
+            ],
+            "concert": [
+                "Stadium_ID"
+            ],
+            "singer_in_concert": [
+                "Singer_ID"
+            ]
+        },
+        "tentative_schema": {
+            "stadium": [
+                "Stadium_ID",
+                "Name"
+            ],
+            "concert": [
+                "Stadium_ID"
+            ],
+            "singer_in_concert": [
+                "Singer_ID"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'concert'.'concert_id'",
+            "'singer_in_concert'.'concert_id'"
+        ],
+        "correct_columns": {
+            "concert": [
+                "concert_id",
+                "stadium_id"
+            ],
+            "singer_in_concert": [
+                "concert_id",
+                "singer_id"
+            ],
+            "stadium": [
+                "stadium_id",
+                "name"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.6
+    },
+    {
+        "tool_name": "generate_candidate",
+        "node_type": "generate_candidate",
+        "generation_based_candidates": [
+            {
+                "template_name": "generate_candidate_one",
+                "candidates": [
+                    " SELECT T1.Name FROM stadium AS T1 INNER JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID INNER JOIN singer_in_concert AS T3 ON T2.concert_ID = T3.concert_ID GROUP BY T1.Name HAVING COUNT(T3.Singer_ID) >= 3 * (SELECT COUNT(T5.Singer_ID) FROM concert AS T4 INNER JOIN singer_in_concert AS T5 ON T4.concert_ID = T5.concert_ID WHERE T4.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Glebe Park')) ",
+                    " WITH GlebeParkSingers AS (     SELECT COUNT(T2.Singer_ID) AS singer_count     FROM singer_in_concert AS T2     INNER JOIN concert AS T3 ON T2.concert_ID = T3.concert_ID     WHERE T3.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Glebe Park') ), StadiumSingers AS (     SELECT T4.Stadium_ID, COUNT(T2.Singer_ID) AS singer_count     FROM singer_in_concert AS T2     INNER JOIN concert AS T3 ON T2.concert_ID = T3.concert_ID     INNER JOIN stadium AS T4 ON T3.Stadium_ID = T4.Stadium_ID     GROUP BY T4.Stadium_ID ) SELECT T1.Name FROM stadium AS T1 INNER JOIN StadiumSingers AS SS ON T1.Stadium_ID = SS.Stadium_ID WHERE SS.singer_count >= 3 * (SELECT singer_count FROM GlebeParkSingers); ",
+                    " SELECT S1.Name FROM stadium AS S1 INNER JOIN singer_in_concert AS S2 ON S1.Stadium_ID = S2.concert_ID GROUP BY S1.Name HAVING COUNT(S2.Singer_ID) >= 3 * (SELECT COUNT(S4.Singer_ID) FROM stadium AS S3 INNER JOIN singer_in_concert AS S4 ON S3.Stadium_ID = S4.concert_ID WHERE S3.Name = 'Glebe Park') "
+                ]
+            }
+        ],
+        "candidates": [
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT T1.Name FROM stadium AS T1 INNER JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID INNER JOIN singer_in_concert AS T3 ON T2.concert_ID = T3.concert_ID GROUP BY T1.Name HAVING COUNT(T3.Singer_ID) >= 3 * (SELECT COUNT(T5.Singer_ID) FROM concert AS T4 INNER JOIN singer_in_concert AS T5 ON T4.concert_ID = T5.concert_ID WHERE T4.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Glebe Park')) ",
+                "plan": "**Question**: Which stadium has had a minimum of three times more singers than Glebe Park does?  \n**Evidence**: \n\n**1. Divide and Conquer:**\n\n* **Main Question:** Which stadium has had a minimum of three times more singers than Glebe Park does?\n    * **Analysis:** We need to find the count of singers associated with Glebe Park and then compare it to the counts of singers associated with other stadiums. We will use a `JOIN` between the `singer_in_concert`, `concert`, and `stadium` tables to get the counts of singers per stadium.\n    * **Pseudo SQL:** SELECT `T1`.`Name` FROM `stadium` AS `T1` INNER JOIN `concert` AS `T2` ON `T1`.`Stadium_ID` = `T2`.`Stadium_ID` INNER JOIN `singer_in_concert` AS `T3` ON `T2`.`concert_ID` = `T3`.`concert_ID` GROUP BY `T1`.`Name` HAVING COUNT(`T3`.`Singer_ID`) >= 3 * (SELECT COUNT(`T4`.`Singer_ID`) FROM `concert` AS `T4` INNER JOIN `singer_in_concert` AS `T5` ON `T4`.`concert_ID` = `T5`.`concert_ID` WHERE `T4`.`Stadium_ID` = (SELECT `Stadium_ID` FROM `stadium` WHERE `Name` = 'Glebe Park'))\n\n    * **Sub-question 1:** Count of singers for Glebe Park\n        * **Analysis:** We need to count the number of singers associated with Glebe Park by joining the `concert` and `singer_in_concert` tables.\n        * **Pseudo SQL:** COUNT(`T5`.`Singer_ID`) FROM `concert` AS `T4` INNER JOIN `singer_in_concert` AS `T5` ON `T4`.`concert_ID` = `T5`.`concert_ID` WHERE `T4`.`Stadium_ID` = (SELECT `Stadium_ID` FROM `stadium` WHERE `Name` = 'Glebe Park')\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (Count of singers for Glebe Park):**\n    * **SQL:** (SELECT COUNT(`T5`.`Singer_ID`) FROM `concert` AS `T4` INNER JOIN `singer_in_concert` AS `T5` ON `T4`.`concert_ID` = `T5`.`concert_ID` WHERE `T4`.`Stadium_ID` = (SELECT `Stadium_ID` FROM `stadium` WHERE `Name` = 'Glebe Park'))\n\n* **Main Question (stadiums with at least three times more singers):**\n    * **SQL:** SELECT `T1`.`Name` FROM `stadium` AS `T1` INNER JOIN `concert` AS `T2` ON `T1`.`Stadium_ID` = `T2`.`Stadium_ID` INNER JOIN `singer_in_concert` AS `T3` ON `T2`.`concert_ID` = `T3`.`concert_ID` GROUP BY `T1`.`Name` HAVING COUNT(`T3`.`Singer_ID`) >= 3 * (SELECT COUNT(`T5`.`Singer_ID`) FROM `concert` AS `T4` INNER JOIN `singer_in_concert` AS `T5` ON `T4`.`concert_ID` = `T5`.`concert_ID` WHERE `T4`.`Stadium_ID` = (SELECT `Stadium_ID` FROM `stadium` WHERE `Name` = 'Glebe Park'))\n\n**3. Simplification and Optimization:**\n\n* The SQL query from step 2 is already efficient as it uses `INNER JOIN` to combine the necessary tables and aggregates the counts correctly. \n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " WITH GlebeParkSingers AS (     SELECT COUNT(T2.Singer_ID) AS singer_count     FROM singer_in_concert AS T2     INNER JOIN concert AS T3 ON T2.concert_ID = T3.concert_ID     WHERE T3.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Glebe Park') ), StadiumSingers AS (     SELECT T4.Stadium_ID, COUNT(T2.Singer_ID) AS singer_count     FROM singer_in_concert AS T2     INNER JOIN concert AS T3 ON T2.concert_ID = T3.concert_ID     INNER JOIN stadium AS T4 ON T3.Stadium_ID = T4.Stadium_ID     GROUP BY T4.Stadium_ID ) SELECT T1.Name FROM stadium AS T1 INNER JOIN StadiumSingers AS SS ON T1.Stadium_ID = SS.Stadium_ID WHERE SS.singer_count >= 3 * (SELECT singer_count FROM GlebeParkSingers); ",
+                "plan": "**Question**: Which stadium has had a minimum of three times more singers than Glebe Park does?  \n**Evidence**: \n\n**1. Divide and Conquer:**\n\n* **Main Question:** Which stadium has had a minimum of three times more singers than Glebe Park does?\n    * **Analysis:** We need to find stadiums that have at least three times the number of singers compared to Glebe Park. This requires us to first determine the number of singers associated with Glebe Park and then compare it to the number of singers for other stadiums.\n    * **Pseudo SQL:** SELECT `T1`.`Name` FROM `stadium` AS `T1` WHERE <number of singers for T1 >= 3 * number of singers for Glebe Park>\n\n    * **Sub-question 1:** number of singers for Glebe Park\n        * **Analysis:** We need to find the `Stadium_ID` for Glebe Park and then count the number of singers associated with it through the `singer_in_concert` and `concert` tables.\n        * **Pseudo SQL:** SELECT COUNT(`T2`.`Singer_ID`) FROM `singer_in_concert` AS `T2` INNER JOIN `concert` AS `T3` ON `T2`.`concert_ID` = `T3`.`concert_ID` WHERE `T3`.`Stadium_ID` = (SELECT `Stadium_ID` FROM `stadium` WHERE `Name` = 'Glebe Park')\n\n    * **Sub-question 2:** number of singers for each stadium\n        * **Analysis:** We need to count the number of singers for each stadium by joining the `singer_in_concert`, `concert`, and `stadium` tables.\n        * **Pseudo SQL:** SELECT `T4`.`Stadium_ID`, COUNT(`T2`.`Singer_ID`) AS `singer_count` FROM `singer_in_concert` AS `T2` INNER JOIN `concert` AS `T3` ON `T2`.`concert_ID` = `T3`.`concert_ID` INNER JOIN `stadium` AS `T4` ON `T3`.`Stadium_ID` = `T4`.`Stadium_ID` GROUP BY `T4`.`Stadium_ID`\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (number of singers for Glebe Park):**\n    * **SQL:** SELECT COUNT(`T2`.`Singer_ID`) FROM `singer_in_concert` AS `T2` INNER JOIN `concert` AS `T3` ON `T2`.`concert_ID` = `T3`.`concert_ID` WHERE `T3`.`Stadium_ID` = (SELECT `Stadium_ID` FROM `stadium` WHERE `Name` = 'Glebe Park')\n\n* **Sub-question 2 (number of singers for each stadium):**\n    * **SQL:** SELECT `T4`.`Stadium_ID`, COUNT(`T2`.`Singer_ID`) AS `singer_count` FROM `singer_in_concert` AS `T2` INNER JOIN `concert` AS `T3` ON `T2`.`concert_ID` = `T3`.`concert_ID` INNER JOIN `stadium` AS `T4` ON `T3`.`Stadium_ID` = `T4`.`Stadium_ID` GROUP BY `T4`.`Stadium_ID`\n\n* **Main Question (stadiums with at least three times more singers):**\n    * **SQL:** SELECT `T1`.`Name` FROM `stadium` AS `T1` WHERE (SELECT COUNT(`T2`.`Singer_ID`) FROM `singer_in_concert` AS `T2` INNER JOIN `concert` AS `T3` ON `T2`.`concert_ID` = `T3`.`concert_ID` WHERE `T3`.`Stadium_ID` = `T1`.`Stadium_ID`) >= 3 * (SELECT COUNT(`T2`.`Singer_ID`) FROM `singer_in_concert` AS `T2` INNER JOIN `concert` AS `T3` ON `T2`.`concert_ID` = `T3`.`concert_ID` WHERE `T3`.`Stadium_ID` = (SELECT `Stadium_ID` FROM `stadium` WHERE `Name` = 'Glebe Park'))\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by using a common table expression (CTE) to calculate the number of singers for Glebe Park and for each stadium in a single query.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT S1.Name FROM stadium AS S1 INNER JOIN singer_in_concert AS S2 ON S1.Stadium_ID = S2.concert_ID GROUP BY S1.Name HAVING COUNT(S2.Singer_ID) >= 3 * (SELECT COUNT(S4.Singer_ID) FROM stadium AS S3 INNER JOIN singer_in_concert AS S4 ON S3.Stadium_ID = S4.concert_ID WHERE S3.Name = 'Glebe Park') ",
+                "plan": "**Question**: Which stadium has had a minimum of three times more singers than Glebe Park does?  \n**Evidence**: \n\n**1. Divide and Conquer:**\n\n* **Main Question:** Which stadium has had a minimum of three times more singers than Glebe Park does?\n    * **Analysis:** We need to find stadiums that have a count of singers that is at least three times the count of singers for Glebe Park. This requires us to first determine the number of singers associated with Glebe Park and then compare it with the counts for other stadiums.\n    * **Pseudo SQL:** SELECT `S1`.`Name` FROM `stadium` AS `S1` INNER JOIN `singer_in_concert` AS `S2` ON `S1`.`Stadium_ID` = `S2`.`concert_ID` GROUP BY `S1`.`Name` HAVING COUNT(`S2`.`Singer_ID`) >= 3 * (SELECT COUNT(`S3`.`Singer_ID`) FROM `stadium` AS `S3` INNER JOIN `singer_in_concert` AS `S4` ON `S3`.`Stadium_ID` = `S4`.`concert_ID` WHERE `S3`.`Name` = 'Glebe Park')\n\n    * **Sub-question 1:** Count of singers for Glebe Park\n        * **Analysis:** We need to filter the `singer_in_concert` table to count the number of singers associated with Glebe Park.\n        * **Pseudo SQL:** SELECT COUNT(`S4`.`Singer_ID`) FROM `stadium` AS `S3` INNER JOIN `singer_in_concert` AS `S4` ON `S3`.`Stadium_ID` = `S4`.`concert_ID` WHERE `S3`.`Name` = 'Glebe Park'\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (count of singers for Glebe Park):**\n    * **SQL:** SELECT COUNT(`S4`.`Singer_ID`) FROM `stadium` AS `S3` INNER JOIN `singer_in_concert` AS `S4` ON `S3`.`Stadium_ID` = `S4`.`concert_ID` WHERE `S3`.`Name` = 'Glebe Park'\n\n* **Main Question (stadiums with at least three times more singers):**\n    * **SQL:** SELECT `S1`.`Name` FROM `stadium` AS `S1` INNER JOIN `singer_in_concert` AS `S2` ON `S1`.`Stadium_ID` = `S2`.`concert_ID` GROUP BY `S1`.`Name` HAVING COUNT(`S2`.`Singer_ID`) >= 3 * (SELECT COUNT(`S4`.`Singer_ID`) FROM `stadium` AS `S3` INNER JOIN `singer_in_concert` AS `S4` ON `S3`.`Stadium_ID` = `S4`.`concert_ID` WHERE `S3`.`Name` = 'Glebe Park')\n\n**3. Simplification and Optimization:**\n\n* The SQL query from step 2 is already efficient. We are using `INNER JOIN` to combine the tables based on their relationships, and the `HAVING` clause clearly defines our filtering criteria.\n\n**Final Optimized SQL Query:**\n\n"
+            }
+        ],
+        "status": "success",
+        "execution_time": 13.5
+    },
+    {
+        "tool_name": "revise",
+        "original_SQL_id": "generate_candidate",
+        "refined_SQL_id": "revise_1",
+        "candidates": [
+            {
+                "refined_query": " SELECT T1.Name FROM stadium AS T1 INNER JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID INNER JOIN singer_in_concert AS T3 ON T2.concert_ID = T3.concert_ID GROUP BY T1.Name HAVING COUNT(T3.Singer_ID) >= 3 * (SELECT COUNT(T5.Singer_ID) FROM concert AS T4 INNER JOIN singer_in_concert AS T5 ON T4.concert_ID = T5.concert_ID WHERE T4.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Glebe Park')) "
+            },
+            {
+                "refined_query": " WITH GlebeParkSingers AS (     SELECT COUNT(T2.Singer_ID) AS singer_count     FROM singer_in_concert AS T2     INNER JOIN concert AS T3 ON T2.concert_ID = T3.concert_ID     WHERE T3.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Glebe Park') ), StadiumSingers AS (     SELECT T4.Stadium_ID, COUNT(T2.Singer_ID) AS singer_count     FROM singer_in_concert AS T2     INNER JOIN concert AS T3 ON T2.concert_ID = T3.concert_ID     INNER JOIN stadium AS T4 ON T3.Stadium_ID = T4.Stadium_ID     GROUP BY T4.Stadium_ID ) SELECT T1.Name FROM stadium AS T1 INNER JOIN StadiumSingers AS SS ON T1.Stadium_ID = SS.Stadium_ID WHERE SS.singer_count >= 3 * (SELECT singer_count FROM GlebeParkSingers); "
+            },
+            {
+                "refined_query": " SELECT S1.Name FROM stadium AS S1 INNER JOIN singer_in_concert AS S2 ON S1.Stadium_ID = S2.concert_ID GROUP BY S1.Name HAVING COUNT(S2.Singer_ID) >= 3 * (SELECT COUNT(S4.Singer_ID) FROM stadium AS S3 INNER JOIN singer_in_concert AS S4 ON S3.Stadium_ID = S4.concert_ID WHERE S3.Name = 'Glebe Park') "
+            }
+        ],
+        "status": "success",
+        "execution_time": 0.1
+    },
+    {
+        "tool_name": "execution_accuracy",
+        "generate_candidate": {
+            "exec_res": 1,
+            "exec_err": "--",
+            "Question": "Which stadium has had a minimum of three times more singers than Glebe Park does?",
+            "Evidence": "",
+            "GOLD_SQL": "SELECT C.Name FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN stadium C ON A.Stadium_ID = C.Stadium_ID GROUP BY C.Stadium_ID HAVING COUNT ( DISTINCT ( B.Singer_ID ) ) >= 3 * ( SELECT COUNT ( DISTINCT ( B.Singer_ID ) ) FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN stadium C ON A.Stadium_ID = C.Stadium_ID WHERE C.name = \"Glebe Park\" )",
+            "PREDICTED_SQL": " SELECT T1.Name FROM stadium AS T1 INNER JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID INNER JOIN singer_in_concert AS T3 ON T2.concert_ID = T3.concert_ID GROUP BY T1.Name HAVING COUNT(T3.Singer_ID) >= 3 * (SELECT COUNT(T5.Singer_ID) FROM concert AS T4 INNER JOIN singer_in_concert AS T5 ON T4.concert_ID = T5.concert_ID WHERE T4.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Glebe Park')) "
+        },
+        "revise_1": {
+            "exec_res": 1,
+            "exec_err": "--",
+            "Question": "Which stadium has had a minimum of three times more singers than Glebe Park does?",
+            "Evidence": "",
+            "GOLD_SQL": "SELECT C.Name FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN stadium C ON A.Stadium_ID = C.Stadium_ID GROUP BY C.Stadium_ID HAVING COUNT ( DISTINCT ( B.Singer_ID ) ) >= 3 * ( SELECT COUNT ( DISTINCT ( B.Singer_ID ) ) FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN stadium C ON A.Stadium_ID = C.Stadium_ID WHERE C.name = \"Glebe Park\" )",
+            "PREDICTED_SQL": " SELECT T1.Name FROM stadium AS T1 INNER JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID INNER JOIN singer_in_concert AS T3 ON T2.concert_ID = T3.concert_ID GROUP BY T1.Name HAVING COUNT(T3.Singer_ID) >= 3 * (SELECT COUNT(T5.Singer_ID) FROM concert AS T4 INNER JOIN singer_in_concert AS T5 ON T4.concert_ID = T5.concert_ID WHERE T4.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Glebe Park')) "
+        },
+        "final_SQL": {
+            "exec_res": 1,
+            "exec_err": "--",
+            "Question": "Which stadium has had a minimum of three times more singers than Glebe Park does?",
+            "Evidence": "",
+            "GOLD_SQL": "SELECT C.Name FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN stadium C ON A.Stadium_ID = C.Stadium_ID GROUP BY C.Stadium_ID HAVING COUNT ( DISTINCT ( B.Singer_ID ) ) >= 3 * ( SELECT COUNT ( DISTINCT ( B.Singer_ID ) ) FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN stadium C ON A.Stadium_ID = C.Stadium_ID WHERE C.name = \"Glebe Park\" )",
+            "PREDICTED_SQL": " SELECT T1.Name FROM stadium AS T1 INNER JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID INNER JOIN singer_in_concert AS T3 ON T2.concert_ID = T3.concert_ID GROUP BY T1.Name HAVING COUNT(T3.Singer_ID) >= 3 * (SELECT COUNT(T5.Singer_ID) FROM concert AS T4 INNER JOIN singer_in_concert AS T5 ON T4.concert_ID = T5.concert_ID WHERE T4.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Glebe Park')) "
+        },
+        "status": "success",
+        "execution_time": 0.0
+    }
+]

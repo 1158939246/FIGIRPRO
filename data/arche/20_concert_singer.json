@@ -1,0 +1,294 @@
+[
+    {
+        "tool_name": "extract_keywords",
+        "keywords": [
+            "singers",
+            "born before 1980",
+            "earn",
+            "$355",
+            "per concert",
+            "singers born after 1980",
+            "$228",
+            "Somerset Park stadium",
+            "spent",
+            "paying the singers",
+            "concerts",
+            "age",
+            "date of birth",
+            "substracting",
+            "given date"
+        ],
+        "status": "success",
+        "execution_time": 1.6
+    },
+    {
+        "tool_name": "retrieve_entity",
+        "similar_columns": {
+            "singer": [
+                "Age"
+            ]
+        },
+        "schema_with_examples": {
+            "stadium": {
+                "Name": [
+                    "Somerset Park"
+                ]
+            }
+        },
+        "status": "success",
+        "execution_time": 3.3
+    },
+    {
+        "tool_name": "retrieve_context",
+        "schema_with_descriptions": {},
+        "status": "success",
+        "execution_time": 26.2
+    },
+    {
+        "tool_name": "filter_column",
+        "tentative_schema": {
+            "stadium": [
+                "Stadium_ID",
+                "Name"
+            ],
+            "singer": [
+                "Name",
+                "Age"
+            ],
+            "concert": [
+                "concert_ID",
+                "Stadium_ID",
+                "Year"
+            ],
+            "singer_in_concert": [
+                "concert_ID",
+                "Singer_ID"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'singer'.'singer_id'"
+        ],
+        "correct_columns": {
+            "concert": [
+                "concert_id",
+                "stadium_id"
+            ],
+            "singer_in_concert": [
+                "concert_id",
+                "singer_id"
+            ],
+            "singer": [
+                "singer_id",
+                "age"
+            ],
+            "stadium": [
+                "stadium_id",
+                "name"
+            ]
+        },
+        "status": "success",
+        "execution_time": 27.1
+    },
+    {
+        "tool_name": "select_tables",
+        "chain_of_thought_reasoning": "To determine the total amount spent on paying singers for concerts held in Somerset Park stadium, we need to analyze the relationships between singers, concerts, and stadiums. The 'singer' table provides information about the singers, including their ages, which is crucial for determining their payment rates based on their birth years. The 'concert' table links concerts to stadiums and contains the stadium ID, which allows us to filter for concerts held in Somerset Park. The 'singer_in_concert' table connects singers to specific concerts, enabling us to calculate the total payment based on the number of concerts each singer performed at Somerset Park. Therefore, all three tables are necessary to gather the required information and perform the calculations.",
+        "selected_tables": [
+            "singer",
+            "concert",
+            "singer_in_concert",
+            "stadium"
+        ],
+        "tentative_schema": {
+            "singer": [
+                "Name",
+                "Age"
+            ],
+            "concert": [
+                "concert_ID",
+                "Stadium_ID",
+                "Year"
+            ],
+            "singer_in_concert": [
+                "concert_ID",
+                "Singer_ID"
+            ],
+            "stadium": [
+                "Stadium_ID",
+                "Name"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'singer'.'singer_id'"
+        ],
+        "correct_columns": {
+            "concert": [
+                "concert_id",
+                "stadium_id"
+            ],
+            "singer_in_concert": [
+                "concert_id",
+                "singer_id"
+            ],
+            "singer": [
+                "singer_id",
+                "age"
+            ],
+            "stadium": [
+                "stadium_id",
+                "name"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.4
+    },
+    {
+        "tool_name": "select_columns",
+        "chain_of_thought_reasoning": "To determine the total amount spent on paying singers for concerts held in Somerset Park stadium, we need to identify singers' ages to categorize their payment rates, the concert details to link them to the stadium, and the stadium information to filter for Somerset Park. The 'Age' column is essential to classify singers as born before or after 1980, which directly affects their payment. The 'Stadium_ID' in the concert table links concerts to the stadium, while the 'Name' in the stadium table helps to filter for Somerset Park. The 'concert_ID' in the singer_in_concert table is necessary to associate singers with specific concerts, allowing us to calculate total payments based on the number of concerts they performed.",
+        "selected_columns": {
+            "stadium": [
+                "Name",
+                "Stadium_ID"
+            ],
+            "singer": [
+                "Age",
+                "Singer_ID"
+            ],
+            "concert": [
+                "Stadium_ID",
+                "concert_ID"
+            ],
+            "singer_in_concert": [
+                "concert_ID",
+                "Singer_ID"
+            ]
+        },
+        "tentative_schema": {
+            "stadium": [
+                "Name",
+                "Stadium_ID"
+            ],
+            "singer": [
+                "Age",
+                "Singer_ID"
+            ],
+            "concert": [
+                "Stadium_ID",
+                "concert_ID"
+            ],
+            "singer_in_concert": [
+                "concert_ID",
+                "Singer_ID"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "concert": [
+                "concert_id",
+                "stadium_id"
+            ],
+            "singer_in_concert": [
+                "concert_id",
+                "singer_id"
+            ],
+            "singer": [
+                "singer_id",
+                "age"
+            ],
+            "stadium": [
+                "stadium_id",
+                "name"
+            ]
+        },
+        "status": "success",
+        "execution_time": 8.2
+    },
+    {
+        "tool_name": "generate_candidate",
+        "node_type": "generate_candidate",
+        "generation_based_candidates": [
+            {
+                "template_name": "generate_candidate_one",
+                "candidates": [
+                    " SELECT SUM(CASE WHEN T4.Age >= 43 THEN 355 ELSE 228 END)  FROM singer_in_concert AS T1  INNER JOIN concert AS T2 ON T1.concert_ID = T2.concert_ID  INNER JOIN stadium AS T3 ON T2.Stadium_ID = T3.Stadium_ID  INNER JOIN singer AS T4 ON T1.Singer_ID = T4.Singer_ID  WHERE T3.Name = 'Somerset Park' ",
+                    " SELECT SUM(CASE WHEN (2023 - singer.Age) < 1980 THEN 355 ELSE 228 END)  FROM singer_in_concert AS sic  INNER JOIN concert AS c ON sic.concert_ID = c.concert_ID  INNER JOIN stadium AS s ON c.Stadium_ID = s.Stadium_ID  INNER JOIN singer AS si ON sic.Singer_ID = si.Singer_ID  WHERE s.Name = 'Somerset Park' ",
+                    " SELECT SUM(CASE WHEN (2023 - T1.Age) < 1980 THEN 355 ELSE 228 END)  FROM singer AS T1  INNER JOIN singer_in_concert AS T2 ON T1.Singer_ID = T2.Singer_ID  INNER JOIN concert AS T3 ON T2.concert_ID = T3.concert_ID  WHERE T3.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Somerset Park') "
+                ]
+            }
+        ],
+        "candidates": [
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT SUM(CASE WHEN T4.Age >= 43 THEN 355 ELSE 228 END)  FROM singer_in_concert AS T1  INNER JOIN concert AS T2 ON T1.concert_ID = T2.concert_ID  INNER JOIN stadium AS T3 ON T2.Stadium_ID = T3.Stadium_ID  INNER JOIN singer AS T4 ON T1.Singer_ID = T4.Singer_ID  WHERE T3.Name = 'Somerset Park' ",
+                "plan": "**Question**: Singers born before 1980 earn $355 per concert, while singers born after 1980 earn $228 per concert. How much was spent on paying the singers for the concerts held in Somerset Park stadium?  \n**Evidence**: Age is calculated by subtracting date of birth from a given date.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** How much was spent on paying the singers for the concerts held in Somerset Park stadium?\n    * **Analysis:** We need to calculate the total payment for singers based on their birth year and the concerts held at Somerset Park. This involves joining the `singer`, `singer_in_concert`, and `concert` tables, filtering by the stadium name, and calculating the total payment based on the age of the singers.\n    * **Pseudo SQL:** SELECT SUM(<payment>) FROM <singer_in_concert> INNER JOIN <concert> INNER JOIN <singer> WHERE <concert held in Somerset Park>\n\n    * **Sub-question 1:** payment calculation\n        * **Analysis:** The payment depends on the age of the singer. We can determine the payment based on whether the singer was born before or after 1980.\n        * **Pseudo SQL:** CASE WHEN <singer born before 1980> THEN 355 ELSE 228 END\n\n    * **Sub-question 2:** concerts held in Somerset Park\n        * **Analysis:** We need to filter the concerts based on the stadium name 'Somerset Park'. This requires joining the `concert` table with the `stadium` table.\n        * **Pseudo SQL:** `stadium`.`Name` = 'Somerset Park'\n\n    * **Sub-question 3:** determine if singer was born before 1980\n        * **Analysis:** We can calculate the age of the singer based on the current year (assumed to be 2023 for this calculation) and check if it is greater than or equal to 43 (i.e., born before 1980).\n        * **Pseudo SQL:** `singer`.`Age` >= 43\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (payment calculation):**\n    * **SQL:** CASE WHEN `singer`.`Age` >= 43 THEN 355 ELSE 228 END\n\n* **Sub-question 2 (concerts held in Somerset Park):**\n    * **SQL:** `stadium`.`Name` = 'Somerset Park'\n\n* **Sub-question 3 (determine if singer was born before 1980):**\n    * **SQL:** `singer`.`Age` >= 43\n\n* **Main Question (total payment):**\n    * **SQL:** SELECT SUM(CASE WHEN `singer`.`Age` >= 43 THEN 355 ELSE 228 END) \n      FROM `singer_in_concert` AS `T1` \n      INNER JOIN `concert` AS `T2` ON `T1`.`concert_ID` = `T2`.`concert_ID` \n      INNER JOIN `stadium` AS `T3` ON `T2`.`Stadium_ID` = `T3`.`Stadium_ID` \n      INNER JOIN `singer` AS `T4` ON `T1`.`Singer_ID` = `T4`.`Singer_ID` \n      WHERE `T3`.`Name` = 'Somerset Park'\n\n**3. Simplification and Optimization:**\n\n* The SQL query from step 2 is already efficient. We have used `INNER JOIN` to combine the necessary tables and calculated the total payment based on the age of the singers.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT SUM(CASE WHEN (2023 - singer.Age) < 1980 THEN 355 ELSE 228 END)  FROM singer_in_concert AS sic  INNER JOIN concert AS c ON sic.concert_ID = c.concert_ID  INNER JOIN stadium AS s ON c.Stadium_ID = s.Stadium_ID  INNER JOIN singer AS si ON sic.Singer_ID = si.Singer_ID  WHERE s.Name = 'Somerset Park' ",
+                "plan": "**Question**: Singers born before 1980 earn $355 per concert, while singers born after 1980 earn $228 per concert. How much was spent on paying the singers for the concerts held in Somerset Park stadium?  \n**Evidence**: Age is calculated by subtracting date of birth from a given date.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** How much was spent on paying the singers for the concerts held in Somerset Park stadium?\n    * **Analysis:** We need to calculate the total amount spent on singers for concerts at Somerset Park. This involves determining the earnings based on the age of the singers and the number of concerts they performed.\n    * **Pseudo SQL:** SELECT SUM(<payment>) FROM <singer_concerts> WHERE <concerts held in Somerset Park>\n\n    * **Sub-question 1:** payment calculation based on age\n        * **Analysis:** We need to determine the payment based on the age of the singers. If the singer's age is calculated as being born before 1980, they earn $355; otherwise, they earn $228.\n        * **Pseudo SQL:** CASE WHEN <age calculation> < 1980 THEN 355 ELSE 228 END\n\n    * **Sub-question 2:** concerts held in Somerset Park\n        * **Analysis:** We need to filter the concerts that took place in Somerset Park. This requires joining the `concert` table with the `stadium` table to find the concerts held at that specific stadium.\n        * **Pseudo SQL:** INNER JOIN `stadium` ON `concert`.`Stadium_ID` = `stadium`.`Stadium_ID` WHERE `stadium`.`Name` = 'Somerset Park'\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (payment calculation based on age):**\n    * **SQL:** CASE WHEN (2023 - `singer`.`Age`) < 1980 THEN 355 ELSE 228 END\n\n* **Sub-question 2 (concerts held in Somerset Park):**\n    * **SQL:** INNER JOIN `stadium` ON `concert`.`Stadium_ID` = `stadium`.`Stadium_ID` WHERE `stadium`.`Name` = 'Somerset Park'\n\n* **Main Question (total spent on singers):**\n    * **SQL:** SELECT SUM(CASE WHEN (2023 - `singer`.`Age`) < 1980 THEN 355 ELSE 228 END) FROM `singer_in_concert` AS `sic` INNER JOIN `concert` AS `c` ON `sic`.`concert_ID` = `c`.`concert_ID` INNER JOIN `stadium` AS `s` ON `c`.`Stadium_ID` = `s`.`Stadium_ID` WHERE `s`.`Name` = 'Somerset Park'\n\n**3. Simplification and Optimization:**\n\n* The SQL query from step 2 is already efficient. We are using `INNER JOIN` to combine the necessary tables and calculating the total payment based on the age of the singers.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT SUM(CASE WHEN (2023 - T1.Age) < 1980 THEN 355 ELSE 228 END)  FROM singer AS T1  INNER JOIN singer_in_concert AS T2 ON T1.Singer_ID = T2.Singer_ID  INNER JOIN concert AS T3 ON T2.concert_ID = T3.concert_ID  WHERE T3.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Somerset Park') ",
+                "plan": "**Question**: Singers born before 1980 earn $355 per concert, while singers born after 1980 earn $228 per concert. How much was spent on paying the singers for the concerts held in Somerset Park stadium?  \n**Evidence**: Age is calculated by subtracting date of birth from a given date.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** How much was spent on paying the singers for the concerts held in Somerset Park stadium?\n    * **Analysis:** We need to calculate the total payment for singers based on their age and the concerts held at Somerset Park. This involves joining the `singer`, `singer_in_concert`, and `concert` tables, filtering by the stadium name, and applying the payment logic based on the birth year.\n    * **Pseudo SQL:** SELECT SUM(<payment>) FROM <joined tables> WHERE <concerts held in Somerset Park>\n\n    * **Sub-question 1:** Calculate payment based on age\n        * **Analysis:** We need to determine the payment based on whether the singer was born before or after 1980. This can be done using a CASE statement.\n        * **Pseudo SQL:** CASE WHEN <singer born before 1980> THEN 355 ELSE 228 END\n\n    * **Sub-question 2:** Join the necessary tables and filter by stadium\n        * **Analysis:** We need to join the `singer`, `singer_in_concert`, and `concert` tables to get the relevant data for concerts held in Somerset Park.\n        * **Pseudo SQL:** SELECT * FROM `singer` AS T1 INNER JOIN `singer_in_concert` AS T2 ON T1.Singer_ID = T2.Singer_ID INNER JOIN `concert` AS T3 ON T2.concert_ID = T3.concert_ID WHERE T3.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Somerset Park')\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (calculate payment based on age):**\n    * **SQL:** CASE WHEN (2023 - T1.Age) < 1980 THEN 355 ELSE 228 END\n\n* **Sub-question 2 (join tables and filter by stadium):**\n    * **SQL:** SELECT T1.Singer_ID, T1.Age, T3.Stadium_ID FROM `singer` AS T1 INNER JOIN `singer_in_concert` AS T2 ON T1.Singer_ID = T2.Singer_ID INNER JOIN `concert` AS T3 ON T2.concert_ID = T3.concert_ID WHERE T3.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Somerset Park')\n\n* **Main Question (total payment):**\n    * **SQL:** SELECT SUM(CASE WHEN (2023 - T1.Age) < 1980 THEN 355 ELSE 228 END) FROM `singer` AS T1 INNER JOIN `singer_in_concert` AS T2 ON T1.Singer_ID = T2.Singer_ID INNER JOIN `concert` AS T3 ON T2.concert_ID = T3.concert_ID WHERE T3.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Somerset Park')\n\n**3. Simplification and Optimization:**\n\n* The SQL query from step 2 is already efficient. We are using `INNER JOIN` to combine the necessary tables and applying the payment logic directly in the `SUM()` function.\n\n**Final Optimized SQL Query:**\n\n"
+            }
+        ],
+        "status": "success",
+        "execution_time": 8.7
+    },
+    {
+        "tool_name": "revise",
+        "original_SQL_id": "generate_candidate",
+        "refined_SQL_id": "revise_1",
+        "candidates": [
+            {
+                "refined_query": " SELECT SUM(CASE WHEN T4.Age >= 43 THEN 355 ELSE 228 END)  FROM singer_in_concert AS T1  INNER JOIN concert AS T2 ON T1.concert_ID = T2.concert_ID  INNER JOIN stadium AS T3 ON T2.Stadium_ID = T3.Stadium_ID  INNER JOIN singer AS T4 ON T1.Singer_ID = T4.Singer_ID  WHERE T3.Name = 'Somerset Park' "
+            },
+            {
+                "refined_query": " SELECT SUM(CASE WHEN (2023 - si.Age) < 1980 THEN 355 ELSE 228 END) FROM singer_in_concert AS sic INNER JOIN concert AS c ON sic.concert_ID = c.concert_ID INNER JOIN stadium AS s ON c.Stadium_ID = s.Stadium_ID INNER JOIN singer AS si ON sic.Singer_ID = si.Singer_ID WHERE s.Name = 'Somerset Park' "
+            },
+            {
+                "refined_query": " SELECT SUM(CASE WHEN (2023 - T1.Age) < 1980 THEN 355 ELSE 228 END)  FROM singer AS T1  INNER JOIN singer_in_concert AS T2 ON T1.Singer_ID = T2.Singer_ID  INNER JOIN concert AS T3 ON T2.concert_ID = T3.concert_ID  WHERE T3.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Somerset Park') "
+            }
+        ],
+        "status": "success",
+        "execution_time": 5.0
+    },
+    {
+        "tool_name": "execution_accuracy",
+        "generate_candidate": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "Singers born before 1980 earn $355 per concert, while singers born after 1980 earn $228 per concert. How much was spent on paying the singers for the concerts held in Somerset Park stadium?",
+            "Evidence": "Age is calculated by substracting date of birth from a given date.",
+            "GOLD_SQL": "SELECT p1 + p2 AS cost FROM ( SELECT 355 * ( COUNT ( * ) ) AS p1 FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON A.Stadium_ID = D.Stadium_ID WHERE D.Name = \"Somerset Park\" AND strftime ( \"%Y\" , \"now\" ) - C.Age < 1980 ) JOIN ( SELECT 228 * ( COUNT ( * ) ) AS p2 FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON A.Stadium_ID = D.Stadium_ID WHERE D.Name = \"Somerset Park\" AND strftime ( \"%Y\" , \"now\" ) - C.Age >= 1980 )",
+            "PREDICTED_SQL": " SELECT SUM(CASE WHEN T4.Age >= 43 THEN 355 ELSE 228 END)  FROM singer_in_concert AS T1  INNER JOIN concert AS T2 ON T1.concert_ID = T2.concert_ID  INNER JOIN stadium AS T3 ON T2.Stadium_ID = T3.Stadium_ID  INNER JOIN singer AS T4 ON T1.Singer_ID = T4.Singer_ID  WHERE T3.Name = 'Somerset Park' "
+        },
+        "revise_1": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "Singers born before 1980 earn $355 per concert, while singers born after 1980 earn $228 per concert. How much was spent on paying the singers for the concerts held in Somerset Park stadium?",
+            "Evidence": "Age is calculated by substracting date of birth from a given date.",
+            "GOLD_SQL": "SELECT p1 + p2 AS cost FROM ( SELECT 355 * ( COUNT ( * ) ) AS p1 FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON A.Stadium_ID = D.Stadium_ID WHERE D.Name = \"Somerset Park\" AND strftime ( \"%Y\" , \"now\" ) - C.Age < 1980 ) JOIN ( SELECT 228 * ( COUNT ( * ) ) AS p2 FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON A.Stadium_ID = D.Stadium_ID WHERE D.Name = \"Somerset Park\" AND strftime ( \"%Y\" , \"now\" ) - C.Age >= 1980 )",
+            "PREDICTED_SQL": " SELECT SUM(CASE WHEN T4.Age >= 43 THEN 355 ELSE 228 END)  FROM singer_in_concert AS T1  INNER JOIN concert AS T2 ON T1.concert_ID = T2.concert_ID  INNER JOIN stadium AS T3 ON T2.Stadium_ID = T3.Stadium_ID  INNER JOIN singer AS T4 ON T1.Singer_ID = T4.Singer_ID  WHERE T3.Name = 'Somerset Park' "
+        },
+        "final_SQL": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "Singers born before 1980 earn $355 per concert, while singers born after 1980 earn $228 per concert. How much was spent on paying the singers for the concerts held in Somerset Park stadium?",
+            "Evidence": "Age is calculated by substracting date of birth from a given date.",
+            "GOLD_SQL": "SELECT p1 + p2 AS cost FROM ( SELECT 355 * ( COUNT ( * ) ) AS p1 FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON A.Stadium_ID = D.Stadium_ID WHERE D.Name = \"Somerset Park\" AND strftime ( \"%Y\" , \"now\" ) - C.Age < 1980 ) JOIN ( SELECT 228 * ( COUNT ( * ) ) AS p2 FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON A.Stadium_ID = D.Stadium_ID WHERE D.Name = \"Somerset Park\" AND strftime ( \"%Y\" , \"now\" ) - C.Age >= 1980 )",
+            "PREDICTED_SQL": " SELECT SUM(CASE WHEN T4.Age >= 43 THEN 355 ELSE 228 END)  FROM singer_in_concert AS T1  INNER JOIN concert AS T2 ON T1.concert_ID = T2.concert_ID  INNER JOIN stadium AS T3 ON T2.Stadium_ID = T3.Stadium_ID  INNER JOIN singer AS T4 ON T1.Singer_ID = T4.Singer_ID  WHERE T3.Name = 'Somerset Park' "
+        },
+        "status": "success",
+        "execution_time": 0.0
+    }
+]

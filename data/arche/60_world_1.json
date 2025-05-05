@@ -1,0 +1,258 @@
+[
+    {
+        "tool_name": "extract_keywords",
+        "keywords": [
+            "country",
+            "majority",
+            "people",
+            "speak English",
+            "highest population density",
+            "lowest population density",
+            "density of population",
+            "ratio",
+            "numbers of people",
+            "size of land"
+        ],
+        "status": "success",
+        "execution_time": 1.1
+    },
+    {
+        "tool_name": "retrieve_entity",
+        "similar_columns": {
+            "city": [
+                "Population"
+            ],
+            "country": [
+                "Population"
+            ]
+        },
+        "schema_with_examples": {},
+        "status": "success",
+        "execution_time": 1.1
+    },
+    {
+        "tool_name": "retrieve_context",
+        "schema_with_descriptions": {},
+        "status": "success",
+        "execution_time": 12.0
+    },
+    {
+        "tool_name": "filter_column",
+        "tentative_schema": {
+            "city": [
+                "CountryCode",
+                "Population"
+            ],
+            "country": [
+                "Code",
+                "Name",
+                "SurfaceArea",
+                "Population",
+                "LocalName"
+            ],
+            "countrylanguage": [
+                "CountryCode",
+                "Language"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'countrylanguage'.'percentage'"
+        ],
+        "correct_columns": {
+            "country": [
+                "surfacearea",
+                "population",
+                "name",
+                "code"
+            ],
+            "countrylanguage": [
+                "countrycode",
+                "percentage"
+            ]
+        },
+        "status": "success",
+        "execution_time": 17.2
+    },
+    {
+        "tool_name": "select_tables",
+        "chain_of_thought_reasoning": "To answer the question, we need to identify the country where the majority of people speak English and calculate its population density compared to the country with the lowest population density. The 'countrylanguage' table is essential to find countries where English is spoken. The 'country' table provides the necessary population and surface area data to calculate population density. The 'city' table is not directly needed for this specific question since we are focusing on countries rather than cities. Therefore, the relevant tables are 'countrylanguage' and 'country'.",
+        "selected_tables": [
+            "countrylanguage",
+            "country"
+        ],
+        "tentative_schema": {
+            "countrylanguage": [
+                "CountryCode",
+                "Language"
+            ],
+            "country": [
+                "Code",
+                "Name",
+                "SurfaceArea",
+                "Population",
+                "LocalName"
+            ],
+            "city": [
+                "Population"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'countrylanguage'.'percentage'"
+        ],
+        "correct_columns": {
+            "country": [
+                "surfacearea",
+                "population",
+                "name",
+                "code"
+            ],
+            "countrylanguage": [
+                "countrycode",
+                "percentage"
+            ]
+        },
+        "status": "success",
+        "execution_time": 1.8
+    },
+    {
+        "tool_name": "select_columns",
+        "chain_of_thought_reasoning": "To determine the country where the majority of people speak English and has the highest population density, we need to calculate population density using the population and surface area. We also need to filter countries based on the language spoken and compare their densities. The columns selected are essential for these calculations and comparisons.",
+        "selected_columns": {
+            "countrylanguage": [
+                "CountryCode",
+                "Language"
+            ],
+            "country": [
+                "Code",
+                "Population",
+                "SurfaceArea"
+            ],
+            "city": [
+                "CountryCode",
+                "Population"
+            ]
+        },
+        "tentative_schema": {
+            "countrylanguage": [
+                "CountryCode",
+                "Language"
+            ],
+            "country": [
+                "Code",
+                "Population",
+                "SurfaceArea"
+            ],
+            "city": [
+                "CountryCode",
+                "Population"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'country'.'name'",
+            "'countrylanguage'.'percentage'"
+        ],
+        "correct_columns": {
+            "country": [
+                "surfacearea",
+                "population",
+                "name",
+                "code"
+            ],
+            "countrylanguage": [
+                "countrycode",
+                "percentage"
+            ]
+        },
+        "status": "success",
+        "execution_time": 1.7
+    },
+    {
+        "tool_name": "generate_candidate",
+        "node_type": "generate_candidate",
+        "generation_based_candidates": [
+            {
+                "template_name": "generate_candidate_one",
+                "candidates": [
+                    " SELECT      Highest.CountryCode AS HighestDensityCountry,     Highest.Density / Lowest.Density AS DensityRatio FROM      (SELECT Code, Population / SurfaceArea AS Density       FROM country       WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50)       ORDER BY Density DESC LIMIT 1) AS Highest,     (SELECT Code, Population / SurfaceArea AS Density       FROM country       WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50)       ORDER BY Density ASC LIMIT 1) AS Lowest ",
+                    " SELECT      (SELECT T1.Population / T1.SurfaceArea FROM country AS T1 INNER JOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode WHERE T2.Language = 'English' AND T2.Percentage > 50 ORDER BY T1.Population / T1.SurfaceArea DESC LIMIT 1) AS HighestDensity,     (SELECT T1.Population / T1.SurfaceArea FROM country AS T1 ORDER BY T1.Population / T1.SurfaceArea ASC LIMIT 1) AS LowestDensity,     (SELECT T1.Population / T1.SurfaceArea FROM country AS T1 INNER JOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode WHERE T2.Language = 'English' AND T2.Percentage > 50 ORDER BY T1.Population / T1.SurfaceArea DESC LIMIT 1) /      (SELECT T1.Population / T1.SurfaceArea FROM country AS T1 ORDER BY T1.Population / T1.SurfaceArea ASC LIMIT 1) AS DensityRatio ",
+                    " SELECT HighDensityCountry.Code, HighDensityCountry.SurfaceArea, LowDensityCountry.SurfaceArea, HighDensityCountry.SurfaceArea / LowDensityCountry.SurfaceArea AS SizeRatio  FROM (SELECT C.Code, C.Population / C.SurfaceArea AS Density, C.SurfaceArea FROM country AS C INNER JOIN countrylanguage AS CL ON C.Code = CL.CountryCode WHERE CL.Language = 'English' AND CL.Percentage > 50 ORDER BY Density DESC LIMIT 1) AS HighDensityCountry,  (SELECT C.Code, C.Population / C.SurfaceArea AS Density, C.SurfaceArea FROM country AS C ORDER BY Density ASC LIMIT 1) AS LowDensityCountry "
+                ]
+            }
+        ],
+        "candidates": [
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT      Highest.CountryCode AS HighestDensityCountry,     Highest.Density / Lowest.Density AS DensityRatio FROM      (SELECT Code, Population / SurfaceArea AS Density       FROM country       WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50)       ORDER BY Density DESC LIMIT 1) AS Highest,     (SELECT Code, Population / SurfaceArea AS Density       FROM country       WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50)       ORDER BY Density ASC LIMIT 1) AS Lowest ",
+                "plan": "**Question**: Which country where the majority of people speak English has the highest population density, how many times larger than the country with the lowest population density?  \n**Evidence**: The density of population is the ratio between the numbers of people to the size of land.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** Which country where the majority of people speak English has the highest population density, how many times larger than the country with the lowest population density?\n    * **Analysis:** We need to find two pieces of information: the country with the highest population density among those where English is the majority language, and the country with the lowest population density. We will then calculate how many times larger the highest density country is compared to the lowest density country.\n    * **Pseudo SQL:** \n      ```sql\n      SELECT <country with highest density>, <density ratio>\n      FROM <sub-query for highest density> \n      JOIN <sub-query for lowest density>\n      ```\n\n    * **Sub-question 1:** Identify countries where the majority speak English.\n        * **Analysis:** We will filter the `countrylanguage` table for entries where `Language` is 'English' and `Percentage` is greater than 50.\n        * **Pseudo SQL:** \n        ```sql\n        SELECT CountryCode \n        FROM countrylanguage \n        WHERE Language = 'English' AND Percentage > 50\n        ```\n\n    * **Sub-question 2:** Calculate population density for countries where the majority speak English.\n        * **Analysis:** We will join the `country` table to get the population and surface area, then calculate the density as `Population / SurfaceArea`.\n        * **Pseudo SQL:** \n        ```sql\n        SELECT Code, Population / SurfaceArea AS Density \n        FROM country \n        WHERE Code IN (<result from sub-question 1>)\n        ```\n\n    * **Sub-question 3:** Find the country with the highest population density.\n        * **Analysis:** We will order the results from sub-question 2 by density in descending order and limit the result to 1.\n        * **Pseudo SQL:** \n        ```sql\n        SELECT Code, Density \n        FROM <result from sub-question 2> \n        ORDER BY Density DESC LIMIT 1\n        ```\n\n    * **Sub-question 4:** Find the country with the lowest population density.\n        * **Analysis:** Similar to sub-question 3, but we will order by density in ascending order.\n        * **Pseudo SQL:** \n        ```sql\n        SELECT Code, Density \n        FROM <result from sub-question 2> \n        ORDER BY Density ASC LIMIT 1\n        ```\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (countries where majority speak English):**\n    * **SQL:** \n    ```sql\n    SELECT CountryCode \n    FROM countrylanguage \n    WHERE Language = 'English' AND Percentage > 50\n    ```\n\n* **Sub-question 2 (population density for those countries):**\n    * **SQL:** \n    ```sql\n    SELECT Code, Population / SurfaceArea AS Density \n    FROM country \n    WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50)\n    ```\n\n* **Sub-question 3 (country with highest population density):**\n    * **SQL:** \n    ```sql\n    SELECT Code, Density \n    FROM (SELECT Code, Population / SurfaceArea AS Density \n          FROM country \n          WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50)) \n    ORDER BY Density DESC LIMIT 1\n    ```\n\n* **Sub-question 4 (country with lowest population density):**\n    * **SQL:** \n    ```sql\n    SELECT Code, Density \n    FROM (SELECT Code, Population / SurfaceArea AS Density \n          FROM country \n          WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50)) \n    ORDER BY Density ASC LIMIT 1\n    ```\n\n* **Main Question (final calculation):**\n    * **SQL:** \n    ```sql\n    SELECT \n        (SELECT Code FROM (SELECT Code, Population / SurfaceArea AS Density \n                           FROM country \n                           WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50)) \n        ORDER BY Density DESC LIMIT 1) AS HighestDensityCountry,\n        (SELECT Density FROM (SELECT Code, Population / SurfaceArea AS Density \n                             FROM country \n                             WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50)) \n        ORDER BY Density DESC LIMIT 1) / \n        (SELECT Density FROM (SELECT Code, Population / SurfaceArea AS Density \n                             FROM country \n                             WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50)) \n        ORDER BY Density ASC LIMIT 1) AS DensityRatio\n    ```\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by combining the calculations into a single query that retrieves both the highest and lowest density in one go, allowing us to calculate the ratio directly.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT      (SELECT T1.Population / T1.SurfaceArea FROM country AS T1 INNER JOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode WHERE T2.Language = 'English' AND T2.Percentage > 50 ORDER BY T1.Population / T1.SurfaceArea DESC LIMIT 1) AS HighestDensity,     (SELECT T1.Population / T1.SurfaceArea FROM country AS T1 ORDER BY T1.Population / T1.SurfaceArea ASC LIMIT 1) AS LowestDensity,     (SELECT T1.Population / T1.SurfaceArea FROM country AS T1 INNER JOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode WHERE T2.Language = 'English' AND T2.Percentage > 50 ORDER BY T1.Population / T1.SurfaceArea DESC LIMIT 1) /      (SELECT T1.Population / T1.SurfaceArea FROM country AS T1 ORDER BY T1.Population / T1.SurfaceArea ASC LIMIT 1) AS DensityRatio ",
+                "plan": "**Question**: Which country where the majority of people speak English has the highest population density, how many times larger than the country with the lowest population density?  \n**Evidence**: The density of population is the ratio between the numbers of people to the size of land.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** Which country where the majority of people speak English has the highest population density, how many times larger than the country with the lowest population density?\n    * **Analysis:** We need to find two countries: one with the highest population density among those where English is the majority language, and another with the lowest population density. We will then compare their densities.\n    * **Pseudo SQL:** SELECT <country with highest density>, <density ratio> FROM <sub-query for highest density> WHERE <majority English speakers> AND <sub-query for lowest density>\n\n    * **Sub-question 1:** country with highest population density\n        * **Analysis:** To find the country with the highest population density, we need to calculate the density as `Population / SurfaceArea` and filter for countries where English is the majority language.\n        * **Pseudo SQL:** SELECT `Code`, `Population` / `SurfaceArea` AS `Density` FROM `country` AS `T1` INNER JOIN `countrylanguage` AS `T2` ON `T1`.`Code` = `T2`.`CountryCode` WHERE `T2`.`Language` = 'English' AND `T2`.`Percentage` > 50 ORDER BY `Density` DESC LIMIT 1\n\n    * **Sub-question 2:** country with lowest population density\n        * **Analysis:** Similarly, we need to find the country with the lowest population density, which can be calculated in the same way.\n        * **Pseudo SQL:** SELECT `Code`, `Population` / `SurfaceArea` AS `Density` FROM `country` ORDER BY `Density` ASC LIMIT 1\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (country with highest population density):**\n    * **SQL:** SELECT `T1`.`Code`, `T1`.`Population` / `T1`.`SurfaceArea` AS `Density` FROM `country` AS `T1` INNER JOIN `countrylanguage` AS `T2` ON `T1`.`Code` = `T2`.`CountryCode` WHERE `T2`.`Language` = 'English' AND `T2`.`Percentage` > 50 ORDER BY `Density` DESC LIMIT 1\n\n* **Sub-question 2 (country with lowest population density):**\n    * **SQL:** SELECT `T1`.`Code`, `T1`.`Population` / `T1`.`SurfaceArea` AS `Density` FROM `country` AS `T1` ORDER BY `Density` ASC LIMIT 1\n\n* **Main Question (density ratio):**\n    * **SQL:** \n    ```sql\n    SELECT \n        (SELECT T1.Population / T1.SurfaceArea FROM country AS T1 INNER JOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode WHERE T2.Language = 'English' AND T2.Percentage > 50 ORDER BY T1.Population / T1.SurfaceArea DESC LIMIT 1) / \n        (SELECT T1.Population / T1.SurfaceArea FROM country AS T1 ORDER BY T1.Population / T1.SurfaceArea ASC LIMIT 1) AS DensityRatio\n    ```\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by combining the two sub-queries into a single query that calculates both densities and their ratio in one go.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT HighDensityCountry.Code, HighDensityCountry.SurfaceArea, LowDensityCountry.SurfaceArea, HighDensityCountry.SurfaceArea / LowDensityCountry.SurfaceArea AS SizeRatio  FROM (SELECT C.Code, C.Population / C.SurfaceArea AS Density, C.SurfaceArea FROM country AS C INNER JOIN countrylanguage AS CL ON C.Code = CL.CountryCode WHERE CL.Language = 'English' AND CL.Percentage > 50 ORDER BY Density DESC LIMIT 1) AS HighDensityCountry,  (SELECT C.Code, C.Population / C.SurfaceArea AS Density, C.SurfaceArea FROM country AS C ORDER BY Density ASC LIMIT 1) AS LowDensityCountry ",
+                "plan": "**Question**: Which country where the majority of people speak English has the highest population density, how many times larger than the country with the lowest population density?  \n**Evidence**: The density of population is the ratio between the numbers of people to the size of land.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** Which country where the majority of people speak English has the highest population density, how many times larger than the country with the lowest population density?\n    * **Analysis:** We need to find two things: the country with the highest population density among those where English is the majority language, and the country with the lowest population density. We will then calculate how many times larger the area of the highest density country is compared to the lowest density country.\n    * **Pseudo SQL:** SELECT `Country with highest density`, `Area of highest density country`, `Area of lowest density country`, `Area of highest density country` / `Area of lowest density country` FROM <sub-queries>\n\n    * **Sub-question 1:** Country with the highest population density where the majority speaks English\n        * **Analysis:** We need to filter countries where English is the majority language and calculate the population density. This requires joining the `countrylanguage` and `country` tables.\n        * **Pseudo SQL:** SELECT `Code`, `Population` / `SurfaceArea` AS `Density` FROM `country` AS `C` INNER JOIN `countrylanguage` AS `CL` ON `C`.`Code` = `CL`.`CountryCode` WHERE `CL`.`Language` = 'English' AND `CL`.`Percentage` > 50 ORDER BY `Density` DESC LIMIT 1\n\n    * **Sub-question 2:** Country with the lowest population density\n        * **Analysis:** We need to calculate the population density for all countries and find the one with the lowest density.\n        * **Pseudo SQL:** SELECT `Code`, `Population` / `SurfaceArea` AS `Density` FROM `country` ORDER BY `Density` ASC LIMIT 1\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (country with highest density where majority speaks English):**\n    * **SQL:** SELECT `C`.`Code`, `C`.`Population` / `C`.`SurfaceArea` AS `Density`, `C`.`SurfaceArea` FROM `country` AS `C` INNER JOIN `countrylanguage` AS `CL` ON `C`.`Code` = `CL`.`CountryCode` WHERE `CL`.`Language` = 'English' AND `CL`.`Percentage` > 50 ORDER BY `Density` DESC LIMIT 1\n\n* **Sub-question 2 (country with lowest density):**\n    * **SQL:** SELECT `C`.`Code`, `C`.`Population` / `C`.`SurfaceArea` AS `Density`, `C`.`SurfaceArea` FROM `country` AS `C` ORDER BY `Density` ASC LIMIT 1\n\n* **Main Question (calculate how many times larger):**\n    * **SQL:** SELECT `HighDensityCountry`.`Code`, `HighDensityCountry`.`SurfaceArea`, `LowDensityCountry`.`SurfaceArea`, `HighDensityCountry`.`SurfaceArea` / `LowDensityCountry`.`SurfaceArea` AS `SizeRatio` FROM (SELECT `C`.`Code`, `C`.`Population` / `C`.`SurfaceArea` AS `Density`, `C`.`SurfaceArea` FROM `country` AS `C` INNER JOIN `countrylanguage` AS `CL` ON `C`.`Code` = `CL`.`CountryCode` WHERE `CL`.`Language` = 'English' AND `CL`.`Percentage` > 50 ORDER BY `Density` DESC LIMIT 1) AS `HighDensityCountry`, (SELECT `C`.`Code`, `C`.`Population` / `C`.`SurfaceArea` AS `Density`, `C`.`SurfaceArea` FROM `country` AS `C` ORDER BY `Density` ASC LIMIT 1) AS `LowDensityCountry`\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by directly joining the results of the two sub-queries to avoid nested queries.\n\n**Final Optimized SQL Query:**\n\n"
+            }
+        ],
+        "status": "success",
+        "execution_time": 17.0
+    },
+    {
+        "tool_name": "revise",
+        "original_SQL_id": "generate_candidate",
+        "refined_SQL_id": "revise_1",
+        "candidates": [
+            {
+                "refined_query": " SELECT Highest.Code AS HighestDensityCountry, Highest.Density / Lowest.Density AS DensityRatio FROM (SELECT Code, Population / SurfaceArea AS Density FROM country WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50) ORDER BY Density DESC LIMIT 1) AS Highest, (SELECT Code, Population / SurfaceArea AS Density FROM country WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50) ORDER BY Density ASC LIMIT 1) AS Lowest "
+            },
+            {
+                "refined_query": " SELECT      (SELECT T1.Population / T1.SurfaceArea FROM country AS T1 INNER JOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode WHERE T2.Language = 'English' AND T2.Percentage > 50 ORDER BY T1.Population / T1.SurfaceArea DESC LIMIT 1) AS HighestDensity,     (SELECT T1.Population / T1.SurfaceArea FROM country AS T1 ORDER BY T1.Population / T1.SurfaceArea ASC LIMIT 1) AS LowestDensity,     (SELECT T1.Population / T1.SurfaceArea FROM country AS T1 INNER JOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode WHERE T2.Language = 'English' AND T2.Percentage > 50 ORDER BY T1.Population / T1.SurfaceArea DESC LIMIT 1) /      (SELECT T1.Population / T1.SurfaceArea FROM country AS T1 ORDER BY T1.Population / T1.SurfaceArea ASC LIMIT 1) AS DensityRatio "
+            },
+            {
+                "refined_query": " SELECT HighDensityCountry.Code, HighDensityCountry.SurfaceArea, LowDensityCountry.SurfaceArea, HighDensityCountry.SurfaceArea / LowDensityCountry.SurfaceArea AS SizeRatio  FROM (SELECT C.Code, C.Population / C.SurfaceArea AS Density, C.SurfaceArea FROM country AS C INNER JOIN countrylanguage AS CL ON C.Code = CL.CountryCode WHERE CL.Language = 'English' AND CL.Percentage > 50 ORDER BY Density DESC LIMIT 1) AS HighDensityCountry,  (SELECT C.Code, C.Population / C.SurfaceArea AS Density, C.SurfaceArea FROM country AS C ORDER BY Density ASC LIMIT 1) AS LowDensityCountry "
+            }
+        ],
+        "status": "success",
+        "execution_time": 12.6
+    },
+    {
+        "tool_name": "execution_accuracy",
+        "generate_candidate": {
+            "exec_res": 0,
+            "exec_err": "no such column: Highest.CountryCode",
+            "Question": "Which country where the majority of people speak English has the highest population density, how many times larger than the country with the lowest population density?",
+            "Evidence": "The density of population is the ratio between the numbers of people to the size of land.",
+            "GOLD_SQL": "SELECT Name , ( 100.0 * Population / SurfaceArea ) / ( SELECT MIN ( 100.0 * Population / SurfaceArea ) FROM country WHERE 100.0 * Population / SurfaceArea > 0 ) AS times FROM country WHERE Code IN ( SELECT CountryCode FROM ( SELECT * , MAX ( Percentage ) FROM countrylanguage GROUP BY CountryCode ) WHERE Language = \"English\" ) ORDER BY 100.0 * Population / SurfaceArea DESC LIMIT 1",
+            "PREDICTED_SQL": " SELECT      Highest.CountryCode AS HighestDensityCountry,     Highest.Density / Lowest.Density AS DensityRatio FROM      (SELECT Code, Population / SurfaceArea AS Density       FROM country       WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50)       ORDER BY Density DESC LIMIT 1) AS Highest,     (SELECT Code, Population / SurfaceArea AS Density       FROM country       WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50)       ORDER BY Density ASC LIMIT 1) AS Lowest "
+        },
+        "revise_1": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "Which country where the majority of people speak English has the highest population density, how many times larger than the country with the lowest population density?",
+            "Evidence": "The density of population is the ratio between the numbers of people to the size of land.",
+            "GOLD_SQL": "SELECT Name , ( 100.0 * Population / SurfaceArea ) / ( SELECT MIN ( 100.0 * Population / SurfaceArea ) FROM country WHERE 100.0 * Population / SurfaceArea > 0 ) AS times FROM country WHERE Code IN ( SELECT CountryCode FROM ( SELECT * , MAX ( Percentage ) FROM countrylanguage GROUP BY CountryCode ) WHERE Language = \"English\" ) ORDER BY 100.0 * Population / SurfaceArea DESC LIMIT 1",
+            "PREDICTED_SQL": " SELECT Highest.Code AS HighestDensityCountry, Highest.Density / Lowest.Density AS DensityRatio FROM (SELECT Code, Population / SurfaceArea AS Density FROM country WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50) ORDER BY Density DESC LIMIT 1) AS Highest, (SELECT Code, Population / SurfaceArea AS Density FROM country WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50) ORDER BY Density ASC LIMIT 1) AS Lowest "
+        },
+        "final_SQL": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "Which country where the majority of people speak English has the highest population density, how many times larger than the country with the lowest population density?",
+            "Evidence": "The density of population is the ratio between the numbers of people to the size of land.",
+            "GOLD_SQL": "SELECT Name , ( 100.0 * Population / SurfaceArea ) / ( SELECT MIN ( 100.0 * Population / SurfaceArea ) FROM country WHERE 100.0 * Population / SurfaceArea > 0 ) AS times FROM country WHERE Code IN ( SELECT CountryCode FROM ( SELECT * , MAX ( Percentage ) FROM countrylanguage GROUP BY CountryCode ) WHERE Language = \"English\" ) ORDER BY 100.0 * Population / SurfaceArea DESC LIMIT 1",
+            "PREDICTED_SQL": " SELECT Highest.Code AS HighestDensityCountry, Highest.Density / Lowest.Density AS DensityRatio FROM (SELECT Code, Population / SurfaceArea AS Density FROM country WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50) ORDER BY Density DESC LIMIT 1) AS Highest, (SELECT Code, Population / SurfaceArea AS Density FROM country WHERE Code IN (SELECT CountryCode FROM countrylanguage WHERE Language = 'English' AND Percentage > 50) ORDER BY Density ASC LIMIT 1) AS Lowest "
+        },
+        "status": "success",
+        "execution_time": 0.0
+    }
+]

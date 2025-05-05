@@ -1,0 +1,188 @@
+[
+    {
+        "tool_name": "extract_keywords",
+        "keywords": [
+            "most common bond type",
+            "MAX(COUNT(bond_type))"
+        ],
+        "status": "success",
+        "execution_time": 0.9
+    },
+    {
+        "tool_name": "retrieve_entity",
+        "similar_columns": {},
+        "schema_with_examples": {},
+        "status": "success",
+        "execution_time": 1.0
+    },
+    {
+        "tool_name": "retrieve_context",
+        "schema_with_descriptions": {
+            "bond": {
+                "bond_type": {
+                    "column_name": "",
+                    "column_description": "type of the bond",
+                    "value_description": "\u0093-\u0094: single bond '=': double bond '#': triple bond"
+                },
+                "molecule_id": {
+                    "column_name": "",
+                    "column_description": "identifying the molecule in which the bond appears",
+                    "value_description": ""
+                },
+                "bond_id": {
+                    "column_name": "",
+                    "column_description": "unique id representing bonds",
+                    "value_description": "TRxxx_A1_A2: TRXXX refers to which molecule A1 and A2 refers to which atom"
+                }
+            },
+            "connected": {
+                "bond_id": {
+                    "column_name": "bond id",
+                    "column_description": "bond id representing bond between two atoms",
+                    "value_description": ""
+                }
+            }
+        },
+        "status": "success",
+        "execution_time": 1.8
+    },
+    {
+        "tool_name": "filter_column",
+        "tentative_schema": {
+            "atom": [],
+            "bond": [
+                "bond_id",
+                "bond_type"
+            ],
+            "connected": [],
+            "molecule": []
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "bond": [
+                "bond_type",
+                "bond_id"
+            ]
+        },
+        "status": "success",
+        "execution_time": 1.7
+    },
+    {
+        "tool_name": "select_tables",
+        "chain_of_thought_reasoning": "To determine the most common bond type, we need to analyze the bond_type column, which is located in the bond table. This table contains the bond_id and bond_type, which are essential for counting occurrences of each bond type. The other tables (connected, atom, and molecule) are not directly relevant to the bond type analysis since they do not contain the bond_type information. Therefore, the bond table is the only necessary table for formulating the SQL query to answer the question.",
+        "selected_tables": [
+            "bond"
+        ],
+        "tentative_schema": {
+            "bond": [
+                "bond_id",
+                "bond_type"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "bond": [
+                "bond_type",
+                "bond_id"
+            ]
+        },
+        "status": "success",
+        "execution_time": 1.6
+    },
+    {
+        "tool_name": "select_columns",
+        "chain_of_thought_reasoning": "To determine the most common bond type, we need to analyze the 'bond_type' column in the 'bond' table. This column contains the types of bonds (single, double, triple) which are essential for counting occurrences. The 'bond_id' column is not necessary for this specific query since we are only interested in the type of bond and its frequency, not the unique identifiers of the bonds themselves.",
+        "selected_columns": {
+            "bond": [
+                "bond_type"
+            ]
+        },
+        "tentative_schema": {
+            "bond": [
+                "bond_type"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'bond'.'bond_id'"
+        ],
+        "correct_columns": {
+            "bond": [
+                "bond_type",
+                "bond_id"
+            ]
+        },
+        "status": "success",
+        "execution_time": 1.7
+    },
+    {
+        "tool_name": "generate_candidate",
+        "node_type": "generate_candidate",
+        "generation_based_candidates": [
+            {
+                "template_name": "generate_candidate_one",
+                "candidates": [
+                    " SELECT bond_type FROM bond GROUP BY bond_type ORDER BY COUNT(bond_type) DESC LIMIT 1 "
+                ]
+            }
+        ],
+        "candidates": [
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT bond_type FROM bond GROUP BY bond_type ORDER BY COUNT(bond_type) DESC LIMIT 1 ",
+                "plan": "**Question**: What is the most common bond type?  \n**Evidence**: most common bond type refers MAX(COUNT(bond_type))\n\n**1. Divide and Conquer:**\n\n* **Main Question:** What is the most common bond type?\n    * **Analysis:** The question is asking for the bond type that appears most frequently in the `bond` table. We will need to count the occurrences of each bond type and then find the maximum count.\n    * **Pseudo SQL:** SELECT `bond_type` FROM `bond` GROUP BY `bond_type` ORDER BY COUNT(`bond_type`) DESC LIMIT 1\n\n    * **Sub-question 1:** Count occurrences of each bond type\n        * **Analysis:** This involves grouping the `bond` table by `bond_type` and counting the number of occurrences for each type.\n        * **Pseudo SQL:** COUNT(`bond_type`)\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (count occurrences of each bond type):**\n    * **SQL:** COUNT(`bond_type`)\n\n* **Main Question (most common bond type):**\n    * **SQL:** SELECT `bond_type` FROM `bond` GROUP BY `bond_type` ORDER BY COUNT(`bond_type`) DESC LIMIT 1\n\n**3. Simplification and Optimization:**\n\n* The SQL query from step 2 is already efficient. We are using `GROUP BY` to aggregate the bond types and `ORDER BY` to sort them by their counts in descending order, limiting the result to the most common bond type.\n\n**Final Optimized SQL Query:**\n\n"
+            }
+        ],
+        "status": "success",
+        "execution_time": 4.4
+    },
+    {
+        "tool_name": "revise",
+        "original_SQL_id": "generate_candidate",
+        "refined_SQL_id": "revise_1",
+        "candidates": [
+            {
+                "refined_query": " SELECT bond_type FROM bond GROUP BY bond_type ORDER BY COUNT(bond_type) DESC LIMIT 1 "
+            }
+        ],
+        "status": "success",
+        "execution_time": 0.1
+    },
+    {
+        "tool_name": "execution_accuracy",
+        "generate_candidate": {
+            "exec_res": 1,
+            "exec_err": "--",
+            "Question": "What is the most common bond type?",
+            "Evidence": "most common bond type refers MAX(COUNT(bond_type))",
+            "GOLD_SQL": "SELECT T.bond_type FROM ( SELECT bond_type, COUNT(bond_id) FROM bond GROUP BY bond_type ORDER BY COUNT(bond_id) DESC LIMIT 1 ) AS T",
+            "PREDICTED_SQL": " SELECT bond_type FROM bond GROUP BY bond_type ORDER BY COUNT(bond_type) DESC LIMIT 1 "
+        },
+        "revise_1": {
+            "exec_res": 1,
+            "exec_err": "--",
+            "Question": "What is the most common bond type?",
+            "Evidence": "most common bond type refers MAX(COUNT(bond_type))",
+            "GOLD_SQL": "SELECT T.bond_type FROM ( SELECT bond_type, COUNT(bond_id) FROM bond GROUP BY bond_type ORDER BY COUNT(bond_id) DESC LIMIT 1 ) AS T",
+            "PREDICTED_SQL": " SELECT bond_type FROM bond GROUP BY bond_type ORDER BY COUNT(bond_type) DESC LIMIT 1 "
+        },
+        "final_SQL": {
+            "exec_res": 1,
+            "exec_err": "--",
+            "Question": "What is the most common bond type?",
+            "Evidence": "most common bond type refers MAX(COUNT(bond_type))",
+            "GOLD_SQL": "SELECT T.bond_type FROM ( SELECT bond_type, COUNT(bond_id) FROM bond GROUP BY bond_type ORDER BY COUNT(bond_id) DESC LIMIT 1 ) AS T",
+            "PREDICTED_SQL": " SELECT bond_type FROM bond GROUP BY bond_type ORDER BY COUNT(bond_type) DESC LIMIT 1 "
+        },
+        "status": "success",
+        "execution_time": 0.0
+    }
+]

@@ -1,0 +1,295 @@
+[
+    {
+        "tool_name": "extract_keywords",
+        "keywords": [
+            "ID",
+            "name",
+            "concert",
+            "Somerset Park stadium",
+            "percentage",
+            "female singers",
+            "concert held at Somerset Park"
+        ],
+        "status": "success",
+        "execution_time": 1.3
+    },
+    {
+        "tool_name": "retrieve_entity",
+        "similar_columns": {
+            "singer": [
+                "Name"
+            ],
+            "stadium": [
+                "Name"
+            ]
+        },
+        "schema_with_examples": {
+            "stadium": {
+                "Name": [
+                    "Somerset Park",
+                    "Somerset Park"
+                ]
+            }
+        },
+        "status": "success",
+        "execution_time": 3.1
+    },
+    {
+        "tool_name": "retrieve_context",
+        "schema_with_descriptions": {},
+        "status": "success",
+        "execution_time": 19.7
+    },
+    {
+        "tool_name": "filter_column",
+        "tentative_schema": {
+            "stadium": [
+                "Stadium_ID",
+                "Location",
+                "Name"
+            ],
+            "singer": [
+                "Singer_ID",
+                "Name",
+                "Is_male"
+            ],
+            "concert": [
+                "concert_ID",
+                "concert_Name",
+                "Stadium_ID"
+            ],
+            "singer_in_concert": [
+                "concert_ID",
+                "Singer_ID"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "concert": [
+                "concert_id",
+                "concert_name",
+                "stadium_id"
+            ],
+            "singer_in_concert": [
+                "concert_id",
+                "singer_id"
+            ],
+            "singer": [
+                "singer_id",
+                "is_male"
+            ],
+            "stadium": [
+                "stadium_id",
+                "name"
+            ]
+        },
+        "status": "success",
+        "execution_time": 3.9
+    },
+    {
+        "tool_name": "select_tables",
+        "chain_of_thought_reasoning": "To answer the question about concerts held at Somerset Park stadium and the percentage of female singers, we need to gather information from multiple tables. The 'stadium' table is essential to identify the stadium's details, specifically to filter for Somerset Park. The 'concert' table is necessary to get the concert ID and name associated with the stadium. The 'singer_in_concert' table is required to link singers to their respective concerts. Finally, the 'singer' table is needed to determine the gender of the singers to calculate the percentage of female singers. Thus, all four tables are interconnected and necessary for the SQL query.",
+        "selected_tables": [
+            "stadium",
+            "concert",
+            "singer_in_concert",
+            "singer"
+        ],
+        "tentative_schema": {
+            "stadium": [
+                "Stadium_ID",
+                "Location",
+                "Name"
+            ],
+            "concert": [
+                "concert_ID",
+                "concert_Name",
+                "Stadium_ID"
+            ],
+            "singer_in_concert": [
+                "concert_ID",
+                "Singer_ID"
+            ],
+            "singer": [
+                "Singer_ID",
+                "Name",
+                "Is_male"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "concert": [
+                "concert_id",
+                "concert_name",
+                "stadium_id"
+            ],
+            "singer_in_concert": [
+                "concert_id",
+                "singer_id"
+            ],
+            "singer": [
+                "singer_id",
+                "is_male"
+            ],
+            "stadium": [
+                "stadium_id",
+                "name"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.8
+    },
+    {
+        "tool_name": "select_columns",
+        "chain_of_thought_reasoning": "To answer the question about concerts held at Somerset Park stadium, we need to identify the relevant concerts and their details, as well as calculate the percentage of female singers. The 'stadium' table provides the location and name of the stadium, while the 'concert' table links concerts to stadiums. The 'singer' and 'singer_in_concert' tables are necessary to determine the gender of the singers participating in each concert. Specifically, we need the concert ID and name from the 'concert' table, the stadium name from the 'stadium' table, and the singer's gender from the 'singer' table to calculate the percentage of female singers.",
+        "selected_columns": {
+            "stadium": [
+                "Stadium_ID",
+                "Name"
+            ],
+            "concert": [
+                "concert_ID",
+                "concert_Name",
+                "Stadium_ID"
+            ],
+            "singer": [
+                "Singer_ID",
+                "Is_male"
+            ],
+            "singer_in_concert": [
+                "concert_ID",
+                "Singer_ID"
+            ]
+        },
+        "tentative_schema": {
+            "stadium": [
+                "Stadium_ID",
+                "Name"
+            ],
+            "concert": [
+                "concert_ID",
+                "concert_Name",
+                "Stadium_ID"
+            ],
+            "singer": [
+                "Singer_ID",
+                "Is_male"
+            ],
+            "singer_in_concert": [
+                "concert_ID",
+                "Singer_ID"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "concert": [
+                "concert_id",
+                "concert_name",
+                "stadium_id"
+            ],
+            "singer_in_concert": [
+                "concert_id",
+                "singer_id"
+            ],
+            "singer": [
+                "singer_id",
+                "is_male"
+            ],
+            "stadium": [
+                "stadium_id",
+                "name"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.1
+    },
+    {
+        "tool_name": "generate_candidate",
+        "node_type": "generate_candidate",
+        "generation_based_candidates": [
+            {
+                "template_name": "generate_candidate_one",
+                "candidates": [
+                    " SELECT T1.concert_ID, T1.concert_Name,         (SELECT COUNT(*) FROM singer AS T3          INNER JOIN singer_in_concert AS T4 ON T3.Singer_ID = T4.Singer_ID          WHERE T4.concert_ID = T1.concert_ID AND T3.Is_male = 'F') * 100.0 /         (SELECT COUNT(*) FROM singer_in_concert AS T4 WHERE T4.concert_ID = T1.concert_ID) AS percentage_female_singers  FROM concert AS T1  INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE T2.Name = 'Somerset Park' ",
+                    " SELECT T1.concert_ID, T1.concert_Name, (COUNT(CASE WHEN T4.Is_male = 'F' THEN 1 END) * 100.0 / COUNT(*)) AS female_percentage FROM concert AS T1 INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID INNER JOIN singer_in_concert AS T3 ON T1.concert_ID = T3.concert_ID INNER JOIN singer AS T4 ON T3.Singer_ID = T4.Singer_ID WHERE T2.Name = 'Somerset Park' GROUP BY T1.concert_ID, T1.concert_Name ",
+                    " SELECT T1.concert_ID, T1.concert_Name,         (SELECT COUNT(*) FROM singer_in_concert AS T3          INNER JOIN singer AS T4 ON T3.Singer_ID = T4.Singer_ID          WHERE T3.concert_ID = T1.concert_ID AND T4.Is_male = 'F') * 100.0 /         (SELECT COUNT(*) FROM singer_in_concert AS T3          WHERE T3.concert_ID = T1.concert_ID) AS percentage_female_singers  FROM concert AS T1  INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE T2.Name = 'Somerset Park' "
+                ]
+            }
+        ],
+        "candidates": [
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT T1.concert_ID, T1.concert_Name,         (SELECT COUNT(*) FROM singer AS T3          INNER JOIN singer_in_concert AS T4 ON T3.Singer_ID = T4.Singer_ID          WHERE T4.concert_ID = T1.concert_ID AND T3.Is_male = 'F') * 100.0 /         (SELECT COUNT(*) FROM singer_in_concert AS T4 WHERE T4.concert_ID = T1.concert_ID) AS percentage_female_singers  FROM concert AS T1  INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE T2.Name = 'Somerset Park' ",
+                "plan": "**Question**: What are the ID and name of each concert held at Somerset Park stadium, and what is the percentage of female singers in each of these concerts held at Somerset Park?\n\n**1. Divide and Conquer:**\n\n* **Main Question:** What are the ID and name of each concert held at Somerset Park stadium, and what is the percentage of female singers in each of these concerts held at Somerset Park?\n    * **Analysis:** We need to retrieve the `concert_ID` and `concert_Name` from the `concert` table for concerts held at Somerset Park. Additionally, we need to calculate the percentage of female singers for each concert, which requires joining the `singer_in_concert`, `singer`, and `stadium` tables.\n    * **Pseudo SQL:** SELECT `T1`.`concert_ID`, `T1`.`concert_Name`, <percentage of female singers> FROM `concert` AS `T1` INNER JOIN `stadium` AS `T2` ON `T1`.`Stadium_ID` = `T2`.`Stadium_ID` WHERE `T2`.`Name` = 'Somerset Park'\n\n    * **Sub-question 1:** percentage of female singers\n        * **Analysis:** To calculate the percentage of female singers, we need to count the number of female singers and the total number of singers for each concert. This requires joining the `singer_in_concert` and `singer` tables.\n        * **Pseudo SQL:** (SELECT COUNT(*) FROM `singer` AS `T3` INNER JOIN `singer_in_concert` AS `T4` ON `T3`.`Singer_ID` = `T4`.`Singer_ID` WHERE `T4`.`concert_ID` = `T1`.`concert_ID` AND `T3`.`Is_male` = 'F') * 100.0 / (SELECT COUNT(*) FROM `singer_in_concert` AS `T4` WHERE `T4`.`concert_ID` = `T1`.`concert_ID`)\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (percentage of female singers):**\n    * **SQL:** (SELECT COUNT(*) FROM `singer` AS `T3` INNER JOIN `singer_in_concert` AS `T4` ON `T3`.`Singer_ID` = `T4`.`Singer_ID` WHERE `T4`.`concert_ID` = `T1`.`concert_ID` AND `T3`.`Is_male` = 'F') * 100.0 / (SELECT COUNT(*) FROM `singer_in_concert` AS `T4` WHERE `T4`.`concert_ID` = `T1`.`concert_ID`)\n\n* **Main Question (concert details and percentage of female singers):**\n    * **SQL:** SELECT `T1`.`concert_ID`, `T1`.`concert_Name`, (SELECT COUNT(*) FROM `singer` AS `T3` INNER JOIN `singer_in_concert` AS `T4` ON `T3`.`Singer_ID` = `T4`.`Singer_ID` WHERE `T4`.`concert_ID` = `T1`.`concert_ID` AND `T3`.`Is_male` = 'F') * 100.0 / (SELECT COUNT(*) FROM `singer_in_concert` AS `T4` WHERE `T4`.`concert_ID` = `T1`.`concert_ID`) AS percentage_female_singers FROM `concert` AS `T1` INNER JOIN `stadium` AS `T2` ON `T1`.`Stadium_ID` = `T2`.`Stadium_ID` WHERE `T2`.`Name` = 'Somerset Park'\n\n**3. Simplification and Optimization:**\n\n* The SQL query from step 2 is already efficient, using `INNER JOIN` to combine the necessary tables and calculating the percentage directly in the `SELECT` clause.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT T1.concert_ID, T1.concert_Name, (COUNT(CASE WHEN T4.Is_male = 'F' THEN 1 END) * 100.0 / COUNT(*)) AS female_percentage FROM concert AS T1 INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID INNER JOIN singer_in_concert AS T3 ON T1.concert_ID = T3.concert_ID INNER JOIN singer AS T4 ON T3.Singer_ID = T4.Singer_ID WHERE T2.Name = 'Somerset Park' GROUP BY T1.concert_ID, T1.concert_Name ",
+                "plan": "**Question**: What are the ID and name of each concert held at Somerset Park stadium, and what is the percentage of female singers in each of these concerts held at Somerset Park?\n\n**1. Divide and Conquer:**\n\n* **Main Question:** What are the ID and name of each concert held at Somerset Park stadium, and what is the percentage of female singers in each of these concerts?\n    * **Analysis:** We need to retrieve the `concert_ID` and `concert_Name` from the `concert` table for concerts held at Somerset Park. Additionally, we need to calculate the percentage of female singers for each concert. This requires joining the `concert`, `singer_in_concert`, and `singer` tables.\n    * **Pseudo SQL:** SELECT `T1`.`concert_ID`, `T1`.`concert_Name`, <percentage of female singers> FROM `concert` AS `T1` INNER JOIN `stadium` AS `T2` ON `T1`.`Stadium_ID` = `T2`.`Stadium_ID` INNER JOIN `singer_in_concert` AS `T3` ON `T1`.`concert_ID` = `T3`.`concert_ID` INNER JOIN `singer` AS `T4` ON `T3`.`Singer_ID` = `T4`.`Singer_ID` WHERE `T2`.`Name` = 'Somerset Park'\n\n    * **Sub-question 1:** percentage of female singers\n        * **Analysis:** To calculate the percentage of female singers, we need to count the total number of singers and the number of female singers for each concert. The percentage can be calculated as (number of female singers / total number of singers) * 100.\n        * **Pseudo SQL:** (COUNT(CASE WHEN `T4`.`Is_male` = 'F' THEN 1 END) * 100.0 / COUNT(*)) AS `female_percentage`\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (percentage of female singers):**\n    * **SQL:** (COUNT(CASE WHEN `T4`.`Is_male` = 'F' THEN 1 END) * 100.0 / COUNT(*)) AS `female_percentage`\n\n* **Main Question (concert details and female percentage):**\n    * **SQL:** SELECT `T1`.`concert_ID`, `T1`.`concert_Name`, (COUNT(CASE WHEN `T4`.`Is_male` = 'F' THEN 1 END) * 100.0 / COUNT(*)) AS `female_percentage` FROM `concert` AS `T1` INNER JOIN `stadium` AS `T2` ON `T1`.`Stadium_ID` = `T2`.`Stadium_ID` INNER JOIN `singer_in_concert` AS `T3` ON `T1`.`concert_ID` = `T3`.`concert_ID` INNER JOIN `singer` AS `T4` ON `T3`.`Singer_ID` = `T4`.`Singer_ID` WHERE `T2`.`Name` = 'Somerset Park' GROUP BY `T1`.`concert_ID`, `T1`.`concert_Name`\n\n**3. Simplification and Optimization:**\n\n* The SQL query from step 2 is already efficient. We have used `INNER JOIN` to combine the necessary tables and calculated the percentage of female singers directly in the main query. The `GROUP BY` clause ensures that we get the correct aggregation for each concert.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT T1.concert_ID, T1.concert_Name,         (SELECT COUNT(*) FROM singer_in_concert AS T3          INNER JOIN singer AS T4 ON T3.Singer_ID = T4.Singer_ID          WHERE T3.concert_ID = T1.concert_ID AND T4.Is_male = 'F') * 100.0 /         (SELECT COUNT(*) FROM singer_in_concert AS T3          WHERE T3.concert_ID = T1.concert_ID) AS percentage_female_singers  FROM concert AS T1  INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE T2.Name = 'Somerset Park' ",
+                "plan": "**Question**: What are the ID and name of each concert held at Somerset Park stadium, and what is the percentage of female singers in each of these concerts held at Somerset Park?  \n**Evidence**: \n\n**1. Divide and Conquer:**\n\n* **Main Question:** What are the ID and name of each concert held at Somerset Park stadium, and what is the percentage of female singers in each of these concerts held at Somerset Park?\n    * **Analysis:** We need to retrieve the `concert_ID` and `concert_Name` from the `concert` table for concerts held at Somerset Park. Additionally, we need to calculate the percentage of female singers for each concert, which requires joining the `singer_in_concert`, `singer`, and `concert` tables.\n    * **Pseudo SQL:** SELECT `T1`.`concert_ID`, `T1`.`concert_Name`, <percentage of female singers> FROM `concert` AS `T1` INNER JOIN `stadium` AS `T2` ON `T1`.`Stadium_ID` = `T2`.`Stadium_ID` WHERE `T2`.`Name` = 'Somerset Park'\n\n    * **Sub-question 1:** percentage of female singers\n        * **Analysis:** To calculate the percentage of female singers, we need to count the total number of singers and the number of female singers for each concert. This requires joining the `singer_in_concert` and `singer` tables.\n        * **Pseudo SQL:** (SELECT COUNT(*) FROM `singer_in_concert` AS `T3` INNER JOIN `singer` AS `T4` ON `T3`.`Singer_ID` = `T4`.`Singer_ID` WHERE `T3`.`concert_ID` = `T1`.`concert_ID` AND `T4`.`Is_male` = 'F') * 100.0 / (SELECT COUNT(*) FROM `singer_in_concert` AS `T3` WHERE `T3`.`concert_ID` = `T1`.`concert_ID`)\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (percentage of female singers):**\n    * **SQL:** (SELECT COUNT(*) FROM `singer_in_concert` AS `T3` INNER JOIN `singer` AS `T4` ON `T3`.`Singer_ID` = `T4`.`Singer_ID` WHERE `T3`.`concert_ID` = `T1`.`concert_ID` AND `T4`.`Is_male` = 'F') * 100.0 / (SELECT COUNT(*) FROM `singer_in_concert` AS `T3` WHERE `T3`.`concert_ID` = `T1`.`concert_ID`)\n\n* **Main Question (concert details and percentage of female singers):**\n    * **SQL:** SELECT `T1`.`concert_ID`, `T1`.`concert_Name`, (SELECT COUNT(*) FROM `singer_in_concert` AS `T3` INNER JOIN `singer` AS `T4` ON `T3`.`Singer_ID` = `T4`.`Singer_ID` WHERE `T3`.`concert_ID` = `T1`.`concert_ID` AND `T4`.`Is_male` = 'F') * 100.0 / (SELECT COUNT(*) FROM `singer_in_concert` AS `T3` WHERE `T3`.`concert_ID` = `T1`.`concert_ID`) AS percentage_female_singers FROM `concert` AS `T1` INNER JOIN `stadium` AS `T2` ON `T1`.`Stadium_ID` = `T2`.`Stadium_ID` WHERE `T2`.`Name` = 'Somerset Park'\n\n**3. Simplification and Optimization:**\n\n* The SQL query from step 2 is already efficient, using `INNER JOIN` to combine the necessary tables and calculating the percentage of female singers directly in the main query.\n\n**Final Optimized SQL Query:**\n\n"
+            }
+        ],
+        "status": "success",
+        "execution_time": 10.2
+    },
+    {
+        "tool_name": "revise",
+        "original_SQL_id": "generate_candidate",
+        "refined_SQL_id": "revise_1",
+        "candidates": [
+            {
+                "refined_query": " SELECT T1.concert_ID, T1.concert_Name,         (SELECT COUNT(*) FROM singer AS T3          INNER JOIN singer_in_concert AS T4 ON T3.Singer_ID = T4.Singer_ID          WHERE T4.concert_ID = T1.concert_ID AND T3.Is_male = 'F') * 100.0 /         (SELECT COUNT(*) FROM singer_in_concert AS T4 WHERE T4.concert_ID = T1.concert_ID) AS percentage_female_singers  FROM concert AS T1  INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE T2.Name = 'Somerset Park' "
+            },
+            {
+                "refined_query": " SELECT T1.concert_ID, T1.concert_Name, (COUNT(CASE WHEN T4.Is_male = 'F' THEN 1 END) * 100.0 / COUNT(*)) AS female_percentage FROM concert AS T1 INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID INNER JOIN singer_in_concert AS T3 ON T1.concert_ID = T3.concert_ID INNER JOIN singer AS T4 ON T3.Singer_ID = T4.Singer_ID WHERE T2.Name = 'Somerset Park' GROUP BY T1.concert_ID, T1.concert_Name "
+            },
+            {
+                "refined_query": " SELECT T1.concert_ID, T1.concert_Name,         (SELECT COUNT(*) FROM singer_in_concert AS T3          INNER JOIN singer AS T4 ON T3.Singer_ID = T4.Singer_ID          WHERE T3.concert_ID = T1.concert_ID AND T4.Is_male = 'F') * 100.0 /         (SELECT COUNT(*) FROM singer_in_concert AS T3          WHERE T3.concert_ID = T1.concert_ID) AS percentage_female_singers  FROM concert AS T1  INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE T2.Name = 'Somerset Park' "
+            }
+        ],
+        "status": "success",
+        "execution_time": 0.1
+    },
+    {
+        "tool_name": "execution_accuracy",
+        "generate_candidate": {
+            "exec_res": 1,
+            "exec_err": "--",
+            "Question": "What are the ID and name of each concert held at Somerset Park stadium, and what is the percentage of female singers in each of these concert held at Somerset Park?",
+            "Evidence": "",
+            "GOLD_SQL": "SELECT t1.concert_ID, t1.concert_Name, 100.0 * n_female / n AS female_proportion FROM (SELECT A.concert_ID, A.concert_Name, COUNT (*) AS n_female FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON D.Stadium_ID = A.Stadium_ID WHERE D.Name = \"Somerset Park\" AND C.Is_male = \"F\" GROUP BY A.concert_ID UNION ALL SELECT A.concert_ID, A.concert_Name, 0 AS n_female FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON D.Stadium_ID = A.Stadium_ID WHERE D.Name = \"Somerset Park\" AND A.concert_ID NOT IN (SELECT A.concert_ID FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON D.Stadium_ID = A.Stadium_ID WHERE D.Name = \"Somerset Park\" AND C.Is_male = \"F\" GROUP BY A.concert_ID) GROUP BY A.concert_ID) t1 JOIN (SELECT A.concert_ID, A.concert_Name, COUNT (*) AS n FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON D.Stadium_ID = A.Stadium_ID WHERE D.Name = \"Somerset Park\" GROUP BY A.concert_ID) t2 ON t1.concert_ID = t2.concert_ID",
+            "PREDICTED_SQL": " SELECT T1.concert_ID, T1.concert_Name,         (SELECT COUNT(*) FROM singer AS T3          INNER JOIN singer_in_concert AS T4 ON T3.Singer_ID = T4.Singer_ID          WHERE T4.concert_ID = T1.concert_ID AND T3.Is_male = 'F') * 100.0 /         (SELECT COUNT(*) FROM singer_in_concert AS T4 WHERE T4.concert_ID = T1.concert_ID) AS percentage_female_singers  FROM concert AS T1  INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE T2.Name = 'Somerset Park' "
+        },
+        "revise_1": {
+            "exec_res": 1,
+            "exec_err": "--",
+            "Question": "What are the ID and name of each concert held at Somerset Park stadium, and what is the percentage of female singers in each of these concert held at Somerset Park?",
+            "Evidence": "",
+            "GOLD_SQL": "SELECT t1.concert_ID, t1.concert_Name, 100.0 * n_female / n AS female_proportion FROM (SELECT A.concert_ID, A.concert_Name, COUNT (*) AS n_female FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON D.Stadium_ID = A.Stadium_ID WHERE D.Name = \"Somerset Park\" AND C.Is_male = \"F\" GROUP BY A.concert_ID UNION ALL SELECT A.concert_ID, A.concert_Name, 0 AS n_female FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON D.Stadium_ID = A.Stadium_ID WHERE D.Name = \"Somerset Park\" AND A.concert_ID NOT IN (SELECT A.concert_ID FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON D.Stadium_ID = A.Stadium_ID WHERE D.Name = \"Somerset Park\" AND C.Is_male = \"F\" GROUP BY A.concert_ID) GROUP BY A.concert_ID) t1 JOIN (SELECT A.concert_ID, A.concert_Name, COUNT (*) AS n FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON D.Stadium_ID = A.Stadium_ID WHERE D.Name = \"Somerset Park\" GROUP BY A.concert_ID) t2 ON t1.concert_ID = t2.concert_ID",
+            "PREDICTED_SQL": " SELECT T1.concert_ID, T1.concert_Name,         (SELECT COUNT(*) FROM singer AS T3          INNER JOIN singer_in_concert AS T4 ON T3.Singer_ID = T4.Singer_ID          WHERE T4.concert_ID = T1.concert_ID AND T3.Is_male = 'F') * 100.0 /         (SELECT COUNT(*) FROM singer_in_concert AS T4 WHERE T4.concert_ID = T1.concert_ID) AS percentage_female_singers  FROM concert AS T1  INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE T2.Name = 'Somerset Park' "
+        },
+        "final_SQL": {
+            "exec_res": 1,
+            "exec_err": "--",
+            "Question": "What are the ID and name of each concert held at Somerset Park stadium, and what is the percentage of female singers in each of these concert held at Somerset Park?",
+            "Evidence": "",
+            "GOLD_SQL": "SELECT t1.concert_ID, t1.concert_Name, 100.0 * n_female / n AS female_proportion FROM (SELECT A.concert_ID, A.concert_Name, COUNT (*) AS n_female FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON D.Stadium_ID = A.Stadium_ID WHERE D.Name = \"Somerset Park\" AND C.Is_male = \"F\" GROUP BY A.concert_ID UNION ALL SELECT A.concert_ID, A.concert_Name, 0 AS n_female FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON D.Stadium_ID = A.Stadium_ID WHERE D.Name = \"Somerset Park\" AND A.concert_ID NOT IN (SELECT A.concert_ID FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON D.Stadium_ID = A.Stadium_ID WHERE D.Name = \"Somerset Park\" AND C.Is_male = \"F\" GROUP BY A.concert_ID) GROUP BY A.concert_ID) t1 JOIN (SELECT A.concert_ID, A.concert_Name, COUNT (*) AS n FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID JOIN singer C ON B.Singer_ID = C.Singer_ID JOIN stadium D ON D.Stadium_ID = A.Stadium_ID WHERE D.Name = \"Somerset Park\" GROUP BY A.concert_ID) t2 ON t1.concert_ID = t2.concert_ID",
+            "PREDICTED_SQL": " SELECT T1.concert_ID, T1.concert_Name,         (SELECT COUNT(*) FROM singer AS T3          INNER JOIN singer_in_concert AS T4 ON T3.Singer_ID = T4.Singer_ID          WHERE T4.concert_ID = T1.concert_ID AND T3.Is_male = 'F') * 100.0 /         (SELECT COUNT(*) FROM singer_in_concert AS T4 WHERE T4.concert_ID = T1.concert_ID) AS percentage_female_singers  FROM concert AS T1  INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE T2.Name = 'Somerset Park' "
+        },
+        "status": "success",
+        "execution_time": 0.0
+    }
+]

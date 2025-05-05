@@ -1,0 +1,261 @@
+[
+    {
+        "tool_name": "extract_keywords",
+        "keywords": [
+            "ID",
+            "name",
+            "post-2012 concert",
+            "more singers",
+            "Happy Tonight",
+            "themed concert",
+            "ratio",
+            "number of singers",
+            "both concerts"
+        ],
+        "status": "success",
+        "execution_time": 1.6
+    },
+    {
+        "tool_name": "retrieve_entity",
+        "similar_columns": {
+            "stadium": [
+                "Name"
+            ],
+            "concert": [
+                "Theme"
+            ],
+            "singer": [
+                "Name"
+            ]
+        },
+        "schema_with_examples": {
+            "concert": {
+                "Theme": [
+                    "Happy Tonight"
+                ]
+            }
+        },
+        "status": "success",
+        "execution_time": 2.4
+    },
+    {
+        "tool_name": "retrieve_context",
+        "schema_with_descriptions": {},
+        "status": "success",
+        "execution_time": 11.7
+    },
+    {
+        "tool_name": "filter_column",
+        "tentative_schema": {
+            "stadium": [
+                "Stadium_ID",
+                "Name"
+            ],
+            "singer": [
+                "Singer_ID",
+                "Name",
+                "Song_release_year"
+            ],
+            "concert": [
+                "concert_ID",
+                "concert_Name",
+                "Theme",
+                "Stadium_ID",
+                "Year"
+            ],
+            "singer_in_concert": [
+                "concert_ID",
+                "Singer_ID"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "concert": [
+                "concert_id",
+                "theme",
+                "concert_name",
+                "year"
+            ],
+            "singer_in_concert": [
+                "concert_id",
+                "singer_id"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.8
+    },
+    {
+        "tool_name": "select_tables",
+        "chain_of_thought_reasoning": "To answer the question, we need to identify concerts that occurred after 2012 and compare the number of singers in those concerts to the number of singers in the 'Happy Tonight' themed concert. The 'singer_in_concert' table is essential because it links singers to concerts, allowing us to count the number of singers for each concert. The 'concert' table is necessary to filter concerts by year and to find the specific concert with the 'Happy Tonight' theme. The 'singer' table is not directly needed for the count but provides context about the singers if their details were required. Therefore, the 'singer_in_concert' and 'concert' tables are the primary tables needed for this query.",
+        "selected_tables": [
+            "singer_in_concert",
+            "concert"
+        ],
+        "tentative_schema": {
+            "singer_in_concert": [
+                "concert_ID",
+                "Singer_ID"
+            ],
+            "concert": [
+                "concert_ID",
+                "concert_Name",
+                "Theme",
+                "Stadium_ID",
+                "Year"
+            ],
+            "stadium": [
+                "Name"
+            ],
+            "singer": [
+                "Name"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "concert": [
+                "concert_id",
+                "theme",
+                "concert_name",
+                "year"
+            ],
+            "singer_in_concert": [
+                "concert_id",
+                "singer_id"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.4
+    },
+    {
+        "tool_name": "select_columns",
+        "chain_of_thought_reasoning": "To answer the question, we need to identify concerts that occurred post-2012, compare the number of singers in those concerts to the number of singers in the 'Happy Tonight' themed concert, and retrieve the ID and name of the concert with more singers. The relevant columns include 'concert_ID' and 'concert_Name' from the 'concert' table for identifying the concerts, 'Theme' to filter for the 'Happy Tonight' concert, and 'Singer_ID' from the 'singer_in_concert' table to count the number of singers in each concert.",
+        "selected_columns": {
+            "concert": [
+                "concert_ID",
+                "concert_Name",
+                "Theme"
+            ],
+            "singer_in_concert": [
+                "concert_ID",
+                "Singer_ID"
+            ]
+        },
+        "tentative_schema": {
+            "concert": [
+                "concert_ID",
+                "concert_Name",
+                "Theme"
+            ],
+            "singer_in_concert": [
+                "concert_ID",
+                "Singer_ID"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'concert'.'year'"
+        ],
+        "correct_columns": {
+            "concert": [
+                "concert_id",
+                "theme",
+                "concert_name",
+                "year"
+            ],
+            "singer_in_concert": [
+                "concert_id",
+                "singer_id"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.0
+    },
+    {
+        "tool_name": "generate_candidate",
+        "node_type": "generate_candidate",
+        "generation_based_candidates": [
+            {
+                "template_name": "generate_candidate_one",
+                "candidates": [
+                    " SELECT T1.concert_ID, T1.concert_Name, (COUNT(T2.Singer_ID) * 1.0 / (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight')) AS ratio FROM concert AS T1 INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID WHERE T1.Year > '2012' GROUP BY T1.concert_ID, T1.concert_Name HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight') ",
+                    " SELECT T1.concert_ID, T1.concert_Name, COUNT(T2.Singer_ID) * 1.0 / (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight') AS ratio  FROM concert AS T1  INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID  WHERE T1.Year > '2012'  GROUP BY T1.concert_ID, T1.concert_Name  HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight') ",
+                    " SELECT T1.concert_ID, T1.concert_Name, COUNT(T2.Singer_ID) * 1.0 / (SELECT COUNT(T4.Singer_ID) FROM singer_in_concert AS T4 INNER JOIN concert AS T5 ON T4.concert_ID = T5.concert_ID WHERE T5.Theme = 'Happy Tonight') AS singer_ratio  FROM concert AS T1  INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID  WHERE T1.Year > '2012'  GROUP BY T1.concert_ID, T1.concert_Name  HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(T4.Singer_ID) FROM singer_in_concert AS T4 INNER JOIN concert AS T5 ON T4.concert_ID = T5.concert_ID WHERE T5.Theme = 'Happy Tonight') "
+                ]
+            }
+        ],
+        "candidates": [
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT T1.concert_ID, T1.concert_Name, (COUNT(T2.Singer_ID) * 1.0 / (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight')) AS ratio FROM concert AS T1 INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID WHERE T1.Year > '2012' GROUP BY T1.concert_ID, T1.concert_Name HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight') ",
+                "plan": "**Question**: What are the ID and name of the post-2012 concert features more singers than the \"Happy Tonight\" themed concert, what is the ratio of the number of singers in both concerts?  \n**Evidence**: \n\n**1. Divide and Conquer:**\n\n* **Main Question:** What are the ID and name of the post-2012 concert features more singers than the \"Happy Tonight\" themed concert, what is the ratio of the number of singers in both concerts?\n    * **Analysis:** We need to find concerts that occurred after 2012 and have more singers than the \"Happy Tonight\" themed concert. We will also need to calculate the ratio of the number of singers in both concerts.\n    * **Pseudo SQL:** SELECT `T1`.`concert_ID`, `T1`.`concert_Name`, <ratio> FROM `concert` AS `T1` WHERE <post-2012> AND <more singers than Happy Tonight>\n\n    * **Sub-question 1:** post-2012\n        * **Analysis:** This can be filtered using the `Year` column in the `concert` table.\n        * **Pseudo SQL:** `T1`.`Year` > '2012'\n\n    * **Sub-question 2:** more singers than \"Happy Tonight\"\n        * **Analysis:** We need to find the number of singers in the \"Happy Tonight\" themed concert and compare it with other concerts. This requires joining the `singer_in_concert`, `concert`, and `singer` tables.\n        * **Pseudo SQL:** `COUNT(T2.Singer_ID)` > (SELECT COUNT(T3.Singer_ID) FROM `singer_in_concert` AS `T3` INNER JOIN `concert` AS `T4` ON `T3`.`concert_ID` = `T4`.`concert_ID` WHERE `T4`.`Theme` = 'Happy Tonight')\n\n    * **Sub-question 2.1:** Count singers in \"Happy Tonight\"\n        * **Analysis:** We will count the number of singers in the \"Happy Tonight\" themed concert.\n        * **Pseudo SQL:** SELECT COUNT(`T3`.`Singer_ID`) FROM `singer_in_concert` AS `T3` INNER JOIN `concert` AS `T4` ON `T3`.`concert_ID` = `T4`.`concert_ID` WHERE `T4`.`Theme` = 'Happy Tonight'\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (post-2012):**\n    * **SQL:** `T1`.`Year` > '2012'\n\n* **Sub-question 2 (more singers than \"Happy Tonight\"):**\n    * **SQL:** `COUNT(T2.Singer_ID)` > (SELECT COUNT(T3.Singer_ID) FROM `singer_in_concert` AS `T3` INNER JOIN `concert` AS `T4` ON `T3`.`concert_ID` = `T4`.`concert_ID` WHERE `T4`.`Theme` = 'Happy Tonight')\n\n* **Main Question (ID and name of concerts):**\n    * **SQL:** SELECT `T1`.`concert_ID`, `T1`.`concert_Name`, (COUNT(T2.Singer_ID) / (SELECT COUNT(T3.Singer_ID) FROM `singer_in_concert` AS `T3` INNER JOIN `concert` AS `T4` ON `T3`.`concert_ID` = `T4`.`concert_ID` WHERE `T4`.`Theme` = 'Happy Tonight')) AS ratio FROM `concert` AS `T1` INNER JOIN `singer_in_concert` AS `T2` ON `T1`.`concert_ID` = `T2`.`concert_ID` WHERE `T1`.`Year` > '2012' GROUP BY `T1`.`concert_ID`, `T1`.`concert_Name` HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(T3.Singer_ID) FROM `singer_in_concert` AS `T3` INNER JOIN `concert` AS `T4` ON `T3`.`concert_ID` = `T4`.`concert_ID` WHERE `T4`.`Theme` = 'Happy Tonight')\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by ensuring that we only join the necessary tables and calculate the ratio directly in the main query.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT T1.concert_ID, T1.concert_Name, COUNT(T2.Singer_ID) * 1.0 / (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight') AS ratio  FROM concert AS T1  INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID  WHERE T1.Year > '2012'  GROUP BY T1.concert_ID, T1.concert_Name  HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight') ",
+                "plan": "**Question**: What are the ID and name of the post-2012 concert that features more singers than the \"Happy Tonight\" themed concert, and what is the ratio of the number of singers in both concerts?  \n**Evidence**: The question requires us to compare the number of singers in two concerts: one being the \"Happy Tonight\" themed concert and the other being any concert after 2012 that has more singers.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** What are the ID and name of the post-2012 concert that features more singers than the \"Happy Tonight\" themed concert, and what is the ratio of the number of singers in both concerts?\n    * **Analysis:** We need to find concerts after 2012 and compare the number of singers in these concerts to the number of singers in the \"Happy Tonight\" themed concert. We will also need to calculate the ratio of the number of singers in both concerts.\n    * **Pseudo SQL:** SELECT `T1`.`concert_ID`, `T1`.`concert_Name`, <ratio> FROM `concert` AS `T1` INNER JOIN `singer_in_concert` AS `T2` ON `T1`.`concert_ID` = `T2`.`concert_ID` WHERE `T1`.`Year` > '2012' AND <more singers than Happy Tonight>\n\n    * **Sub-question 1:** more singers than \"Happy Tonight\"\n        * **Analysis:** We need to find the number of singers in the \"Happy Tonight\" themed concert first. This requires filtering the `concert` table for the \"Happy Tonight\" theme and joining with the `singer_in_concert` table to count the number of singers.\n        * **Pseudo SQL:** `COUNT(T2.Singer_ID) > (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight')`\n\n    * **Sub-question 2:** ratio of the number of singers\n        * **Analysis:** The ratio can be calculated as the number of singers in the current concert divided by the number of singers in the \"Happy Tonight\" themed concert.\n        * **Pseudo SQL:** `COUNT(T2.Singer_ID) / (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight')`\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (more singers than \"Happy Tonight\"):**\n    * **SQL:** `COUNT(T2.Singer_ID) > (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight')`\n\n* **Sub-question 2 (ratio of the number of singers):**\n    * **SQL:** `COUNT(T2.Singer_ID) / (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight')`\n\n* **Main Question (ID and name of the concert):**\n    * **SQL:** SELECT `T1`.`concert_ID`, `T1`.`concert_Name`, COUNT(T2.Singer_ID) / (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight') AS ratio FROM `concert` AS `T1` INNER JOIN `singer_in_concert` AS `T2` ON `T1`.`concert_ID` = `T2`.`concert_ID` WHERE `T1`.`Year` > '2012' AND COUNT(T2.Singer_ID) > (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight') GROUP BY `T1`.`concert_ID`, `T1`.`concert_Name`\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by ensuring that we perform the necessary aggregations and filtering in a single query without excessive nesting.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT T1.concert_ID, T1.concert_Name, COUNT(T2.Singer_ID) * 1.0 / (SELECT COUNT(T4.Singer_ID) FROM singer_in_concert AS T4 INNER JOIN concert AS T5 ON T4.concert_ID = T5.concert_ID WHERE T5.Theme = 'Happy Tonight') AS singer_ratio  FROM concert AS T1  INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID  WHERE T1.Year > '2012'  GROUP BY T1.concert_ID, T1.concert_Name  HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(T4.Singer_ID) FROM singer_in_concert AS T4 INNER JOIN concert AS T5 ON T4.concert_ID = T5.concert_ID WHERE T5.Theme = 'Happy Tonight') ",
+                "plan": "**Question**: What are the ID and name of the post-2012 concert features more singers than the \"Happy Tonight\" themed concert, what is the ratio of the number of singers in both concerts?  \n**Evidence**: \n\n**1. Divide and Conquer:**\n\n* **Main Question:** What are the ID and name of the post-2012 concert features more singers than the \"Happy Tonight\" themed concert, what is the ratio of the number of singers in both concerts?\n    * **Analysis:** We need to find concerts that occurred after 2012 and have more singers than the \"Happy Tonight\" themed concert. We will also calculate the ratio of the number of singers in both concerts.\n    * **Pseudo SQL:** SELECT `T1`.`concert_ID`, `T1`.`concert_Name`, (SELECT COUNT(`T2`.`Singer_ID`) FROM `singer_in_concert` AS `T2` WHERE `T2`.`concert_ID` = `T3`.`concert_ID`) / (SELECT COUNT(`T4`.`Singer_ID`) FROM `singer_in_concert` AS `T4` INNER JOIN `concert` AS `T5` ON `T4`.`concert_ID` = `T5`.`concert_ID` WHERE `T5`.`Theme` = 'Happy Tonight') AS `singer_ratio` FROM `concert` AS `T1` WHERE `T1`.`Year` > '2012' AND (SELECT COUNT(`T2`.`Singer_ID`) FROM `singer_in_concert` AS `T2` WHERE `T2`.`concert_ID` = `T1`.`concert_ID`) > (SELECT COUNT(`T4`.`Singer_ID`) FROM `singer_in_concert` AS `T4` INNER JOIN `concert` AS `T5` ON `T4`.`concert_ID` = `T5`.`concert_ID` WHERE `T5`.`Theme` = 'Happy Tonight')\n\n    * **Sub-question 1:** Count of singers in the \"Happy Tonight\" themed concert\n        * **Analysis:** We need to count the number of singers in the concert with the theme \"Happy Tonight\".\n        * **Pseudo SQL:** SELECT COUNT(`Singer_ID`) FROM `singer_in_concert` AS `T4` INNER JOIN `concert` AS `T5` ON `T4`.`concert_ID` = `T5`.`concert_ID` WHERE `T5`.`Theme` = 'Happy Tonight'\n\n    * **Sub-question 2:** Count of singers in each concert\n        * **Analysis:** We need to count the number of singers for each concert to compare with the \"Happy Tonight\" concert.\n        * **Pseudo SQL:** SELECT COUNT(`Singer_ID`) FROM `singer_in_concert` AS `T2` WHERE `T2`.`concert_ID` = `T1`.`concert_ID`\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (Count of singers in the \"Happy Tonight\" themed concert):**\n    * **SQL:** (SELECT COUNT(`T4`.`Singer_ID`) FROM `singer_in_concert` AS `T4` INNER JOIN `concert` AS `T5` ON `T4`.`concert_ID` = `T5`.`concert_ID` WHERE `T5`.`Theme` = 'Happy Tonight')\n\n* **Sub-question 2 (Count of singers in each concert):**\n    * **SQL:** (SELECT COUNT(`T2`.`Singer_ID`) FROM `singer_in_concert` AS `T2` WHERE `T2`.`concert_ID` = `T1`.`concert_ID`)\n\n* **Main Question (ID and name of post-2012 concerts with more singers):**\n    * **SQL:** SELECT `T1`.`concert_ID`, `T1`.`concert_Name`, (SELECT COUNT(`T2`.`Singer_ID`) FROM `singer_in_concert` AS `T2` WHERE `T2`.`concert_ID` = `T1`.`concert_ID`) / (SELECT COUNT(`T4`.`Singer_ID`) FROM `singer_in_concert` AS `T4` INNER JOIN `concert` AS `T5` ON `T4`.`concert_ID` = `T5`.`concert_ID` WHERE `T5`.`Theme` = 'Happy Tonight') AS `singer_ratio` FROM `concert` AS `T1` WHERE `T1`.`Year` > '2012' AND (SELECT COUNT(`T2`.`Singer_ID`) FROM `singer_in_concert` AS `T2` WHERE `T2`.`concert_ID` = `T1`.`concert_ID`) > (SELECT COUNT(`T4`.`Singer_ID`) FROM `singer_in_concert` AS `T4` INNER JOIN `concert` AS `T5` ON `T4`.`concert_ID` = `T5`.`concert_ID` WHERE `T5`.`Theme` = 'Happy Tonight')\n\n**3. Simplification and Optimization:**\n\n* The SQL query can be simplified by using a `JOIN` instead of nested subqueries for counting singers. This will improve performance and readability.\n\n**Final Optimized SQL Query:**\n\n"
+            }
+        ],
+        "status": "success",
+        "execution_time": 14.0
+    },
+    {
+        "tool_name": "revise",
+        "original_SQL_id": "generate_candidate",
+        "refined_SQL_id": "revise_1",
+        "candidates": [
+            {
+                "refined_query": " SELECT T1.concert_ID, T1.concert_Name, (COUNT(T2.Singer_ID) * 1.0 / (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight')) AS ratio FROM concert AS T1 INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID WHERE T1.Year > '2012' GROUP BY T1.concert_ID, T1.concert_Name HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight') "
+            },
+            {
+                "refined_query": " SELECT T1.concert_ID, T1.concert_Name, COUNT(T2.Singer_ID) * 1.0 / (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight') AS ratio  FROM concert AS T1  INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID  WHERE T1.Year > '2012'  GROUP BY T1.concert_ID, T1.concert_Name  HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight') "
+            },
+            {
+                "refined_query": " SELECT T1.concert_ID, T1.concert_Name, COUNT(T2.Singer_ID) * 1.0 / (SELECT COUNT(T4.Singer_ID) FROM singer_in_concert AS T4 INNER JOIN concert AS T5 ON T4.concert_ID = T5.concert_ID WHERE T5.Theme = 'Happy Tonight') AS singer_ratio  FROM concert AS T1  INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID  WHERE T1.Year > '2012'  GROUP BY T1.concert_ID, T1.concert_Name  HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(T4.Singer_ID) FROM singer_in_concert AS T4 INNER JOIN concert AS T5 ON T4.concert_ID = T5.concert_ID WHERE T5.Theme = 'Happy Tonight') "
+            }
+        ],
+        "status": "success",
+        "execution_time": 0.1
+    },
+    {
+        "tool_name": "execution_accuracy",
+        "generate_candidate": {
+            "exec_res": 1,
+            "exec_err": "--",
+            "Question": "What are the ID and name of the post-2012 concert features more singers than the \"Happy Tonight\" themed concert, what is the ratio of the number of singers in both concerts?",
+            "Evidence": "",
+            "GOLD_SQL": "SELECT A.concert_ID, A.concert_Name, 1.0 * COUNT (DISTINCT (B.Singer_ID)) / (SELECT COUNT (DISTINCT (B.Singer_ID)) FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Theme = \"Happy Tonight\" ) AS times FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Year > 2012 GROUP BY A.concert_ID HAVING COUNT (DISTINCT (B.Singer_ID)) > (SELECT COUNT (DISTINCT (B.Singer_ID)) FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Theme = \"Happy Tonight\" )",
+            "PREDICTED_SQL": " SELECT T1.concert_ID, T1.concert_Name, (COUNT(T2.Singer_ID) * 1.0 / (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight')) AS ratio FROM concert AS T1 INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID WHERE T1.Year > '2012' GROUP BY T1.concert_ID, T1.concert_Name HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight') "
+        },
+        "revise_1": {
+            "exec_res": 1,
+            "exec_err": "--",
+            "Question": "What are the ID and name of the post-2012 concert features more singers than the \"Happy Tonight\" themed concert, what is the ratio of the number of singers in both concerts?",
+            "Evidence": "",
+            "GOLD_SQL": "SELECT A.concert_ID, A.concert_Name, 1.0 * COUNT (DISTINCT (B.Singer_ID)) / (SELECT COUNT (DISTINCT (B.Singer_ID)) FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Theme = \"Happy Tonight\" ) AS times FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Year > 2012 GROUP BY A.concert_ID HAVING COUNT (DISTINCT (B.Singer_ID)) > (SELECT COUNT (DISTINCT (B.Singer_ID)) FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Theme = \"Happy Tonight\" )",
+            "PREDICTED_SQL": " SELECT T1.concert_ID, T1.concert_Name, (COUNT(T2.Singer_ID) * 1.0 / (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight')) AS ratio FROM concert AS T1 INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID WHERE T1.Year > '2012' GROUP BY T1.concert_ID, T1.concert_Name HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight') "
+        },
+        "final_SQL": {
+            "exec_res": 1,
+            "exec_err": "--",
+            "Question": "What are the ID and name of the post-2012 concert features more singers than the \"Happy Tonight\" themed concert, what is the ratio of the number of singers in both concerts?",
+            "Evidence": "",
+            "GOLD_SQL": "SELECT A.concert_ID, A.concert_Name, 1.0 * COUNT (DISTINCT (B.Singer_ID)) / (SELECT COUNT (DISTINCT (B.Singer_ID)) FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Theme = \"Happy Tonight\" ) AS times FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Year > 2012 GROUP BY A.concert_ID HAVING COUNT (DISTINCT (B.Singer_ID)) > (SELECT COUNT (DISTINCT (B.Singer_ID)) FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Theme = \"Happy Tonight\" )",
+            "PREDICTED_SQL": " SELECT T1.concert_ID, T1.concert_Name, (COUNT(T2.Singer_ID) * 1.0 / (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight')) AS ratio FROM concert AS T1 INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID WHERE T1.Year > '2012' GROUP BY T1.concert_ID, T1.concert_Name HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(T3.Singer_ID) FROM singer_in_concert AS T3 INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID WHERE T4.Theme = 'Happy Tonight') "
+        },
+        "status": "success",
+        "execution_time": 0.0
+    }
+]

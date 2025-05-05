@@ -1,0 +1,274 @@
+[
+    {
+        "tool_name": "extract_keywords",
+        "keywords": [
+            "Bleeding Love",
+            "concert",
+            "Glebe Park stadium",
+            "percentage",
+            "top three stadiums",
+            "average attendance rate",
+            "attendance rate",
+            "attendance amount",
+            "capacity of the stadium"
+        ],
+        "status": "success",
+        "execution_time": 1.9
+    },
+    {
+        "tool_name": "retrieve_entity",
+        "similar_columns": {
+            "stadium": [
+                "Capacity",
+                "Average"
+            ]
+        },
+        "schema_with_examples": {
+            "stadium": {
+                "Name": [
+                    "Glebe Park"
+                ]
+            },
+            "concert": {
+                "Theme": [
+                    "Bleeding Love"
+                ]
+            },
+            "singer": {
+                "Song_Name": [
+                    "Love"
+                ]
+            }
+        },
+        "status": "success",
+        "execution_time": 3.0
+    },
+    {
+        "tool_name": "retrieve_context",
+        "schema_with_descriptions": {},
+        "status": "success",
+        "execution_time": 40.3
+    },
+    {
+        "tool_name": "filter_column",
+        "tentative_schema": {
+            "stadium": [
+                "Stadium_ID",
+                "Name",
+                "Capacity",
+                "Average"
+            ],
+            "singer": [],
+            "concert": [
+                "Theme",
+                "Stadium_ID"
+            ],
+            "singer_in_concert": []
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'stadium'.'Glebe Park'",
+            "'concert'.'Bleeding Love'"
+        ],
+        "correct_columns": {
+            "stadium": [
+                "stadium_id",
+                "name",
+                "Glebe Park",
+                "capacity",
+                "average"
+            ],
+            "concert": [
+                "stadium_id",
+                "theme",
+                "Bleeding Love"
+            ]
+        },
+        "status": "success",
+        "execution_time": 7.2
+    },
+    {
+        "tool_name": "select_tables",
+        "chain_of_thought_reasoning": "To answer the question about the percentage of concerts held in the top three stadiums in terms of average attendance rate, we need to gather data from multiple tables. The 'concert' table is essential because it contains the concert theme and the associated stadium ID. The 'stadium' table is necessary to obtain the capacity and average attendance of each stadium, which is crucial for calculating the attendance rate. Lastly, the 'singer_in_concert' table is needed to link singers to concerts, which may be relevant for understanding the overall concert data, although it may not be directly required for the percentage calculation. Therefore, the selected tables are 'concert', 'stadium', and 'singer_in_concert'.",
+        "selected_tables": [
+            "concert",
+            "stadium",
+            "singer_in_concert"
+        ],
+        "tentative_schema": {
+            "concert": [
+                "Theme",
+                "Stadium_ID"
+            ],
+            "stadium": [
+                "Stadium_ID",
+                "Name",
+                "Capacity",
+                "Average"
+            ],
+            "singer_in_concert": []
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'stadium'.'Glebe Park'",
+            "'concert'.'Bleeding Love'"
+        ],
+        "correct_columns": {
+            "stadium": [
+                "stadium_id",
+                "name",
+                "Glebe Park",
+                "capacity",
+                "average"
+            ],
+            "concert": [
+                "stadium_id",
+                "theme",
+                "Bleeding Love"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.2
+    },
+    {
+        "tool_name": "select_columns",
+        "chain_of_thought_reasoning": "To answer the question, we need to identify the concerts held at Glebe Park and calculate the percentage of these concerts relative to the total concerts held in the top three stadiums based on average attendance. The 'Theme' column in the 'concert' table is essential to filter for the 'Bleeding Love' concert. The 'Stadium_ID' column in the 'concert' table links to the 'stadium' table, where we need the 'Average' column to determine the top three stadiums by average attendance. The 'Capacity' column in the 'stadium' table is also necessary to calculate the attendance rate. Finally, the 'concert_ID' column in the 'singer_in_concert' table is needed to count the total concerts held.",
+        "selected_columns": {
+            "concert": [
+                "Theme",
+                "Stadium_ID",
+                "concert_ID"
+            ],
+            "stadium": [
+                "Average",
+                "Capacity"
+            ],
+            "singer_in_concert": [
+                "concert_ID"
+            ]
+        },
+        "tentative_schema": {
+            "concert": [
+                "Theme",
+                "Stadium_ID",
+                "concert_ID"
+            ],
+            "stadium": [
+                "Average",
+                "Capacity"
+            ],
+            "singer_in_concert": [
+                "concert_ID"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'stadium'.'stadium_id'",
+            "'stadium'.'name'",
+            "'stadium'.'Glebe Park'",
+            "'concert'.'Bleeding Love'"
+        ],
+        "correct_columns": {
+            "stadium": [
+                "stadium_id",
+                "name",
+                "Glebe Park",
+                "capacity",
+                "average"
+            ],
+            "concert": [
+                "stadium_id",
+                "theme",
+                "Bleeding Love"
+            ]
+        },
+        "status": "success",
+        "execution_time": 3.1
+    },
+    {
+        "tool_name": "generate_candidate",
+        "node_type": "generate_candidate",
+        "generation_based_candidates": [
+            {
+                "template_name": "generate_candidate_one",
+                "candidates": [
+                    " SELECT (COUNT(C.concert_ID) * 100.0 / (SELECT COUNT(*) FROM concert)) AS percentage  FROM concert AS C  INNER JOIN stadium AS S ON C.Stadium_ID = S.Stadium_ID  WHERE S.Stadium_ID IN (SELECT S.Stadium_ID FROM stadium AS S ORDER BY (Average * 1.0 / Capacity) DESC LIMIT 3) ",
+                    " SELECT (COUNT(T1.concert_ID) * 100.0 / (SELECT COUNT(T2.concert_ID) FROM concert AS T2 WHERE T2.Theme = 'Bleeding Love' AND T2.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Glebe Park'))) AS percentage  FROM concert AS T1  INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE T2.Stadium_ID IN (SELECT T3.Stadium_ID FROM stadium AS T3 ORDER BY (T3.Average * 1.0 / T3.Capacity) DESC LIMIT 3) ",
+                    " WITH TopStadiums AS (     SELECT Stadium_ID     FROM (         SELECT Stadium_ID, SUM(Attendance) / Capacity AS Attendance_Rate         FROM concert         INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID         GROUP BY Stadium_ID     )     ORDER BY Attendance_Rate DESC     LIMIT 3 ) SELECT (COUNT(*) * 100.0 / (SELECT COUNT(*) FROM concert)) AS Percentage FROM concert WHERE Stadium_ID IN (SELECT Stadium_ID FROM TopStadiums) AND Theme = 'Bleeding Love'; "
+                ]
+            }
+        ],
+        "candidates": [
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT (COUNT(C.concert_ID) * 100.0 / (SELECT COUNT(*) FROM concert)) AS percentage  FROM concert AS C  INNER JOIN stadium AS S ON C.Stadium_ID = S.Stadium_ID  WHERE S.Stadium_ID IN (SELECT S.Stadium_ID FROM stadium AS S ORDER BY (Average * 1.0 / Capacity) DESC LIMIT 3) ",
+                "plan": "**Question**: If the \"Bleeding Love\" themed concert was held at Glebe Park stadium, what percentage of the concerts were held in the top three stadiums in terms of average attendance rate?  \n**Evidence**: Attendance rate is calculated by dividing attendance amount by the capacity of the stadium.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** If the \"Bleeding Love\" themed concert was held at Glebe Park stadium, what percentage of the concerts were held in the top three stadiums in terms of average attendance rate?\n    * **Analysis:** We need to calculate the percentage of concerts held in the top three stadiums based on average attendance rate. This involves determining the top three stadiums, counting the total number of concerts, and counting the concerts held in those top three stadiums.\n    * **Pseudo SQL:** SELECT (COUNT(<concerts in top 3 stadiums>) / COUNT(<total concerts>)) * 100 AS percentage FROM <concerts> WHERE <Bleeding Love concert held at Glebe Park>\n\n    * **Sub-question 1:** Count of concerts in top three stadiums\n        * **Analysis:** We need to calculate the average attendance rate for each stadium and then select the top three based on that rate. The attendance rate is calculated as the average attendance divided by the capacity.\n        * **Pseudo SQL:** COUNT(*) FROM `concert` AS `C` INNER JOIN `stadium` AS `S` ON `C`.`Stadium_ID` = `S`.`Stadium_ID` WHERE <top 3 stadiums>\n\n        * **Sub-question 1.1:** Determine top three stadiums by average attendance rate\n            * **Analysis:** We need to calculate the average attendance for each stadium and order them to find the top three.\n            * **Pseudo SQL:** SELECT `S`.`Stadium_ID` FROM `stadium` AS `S` ORDER BY (`Average` / `Capacity`) DESC LIMIT 3\n\n    * **Sub-question 2:** Count of total concerts\n        * **Analysis:** This is a straightforward count of all concerts.\n        * **Pseudo SQL:** COUNT(*) FROM `concert`\n\n**2. Assembling SQL:**\n\n* **Sub-question 1.1 (top three stadiums):**\n    * **SQL:** SELECT `S`.`Stadium_ID` FROM `stadium` AS `S` ORDER BY (`Average` / `Capacity`) DESC LIMIT 3\n\n* **Sub-question 1 (count of concerts in top three stadiums):**\n    * **SQL:** COUNT(*) FROM `concert` AS `C` INNER JOIN `stadium` AS `S` ON `C`.`Stadium_ID` = `S`.`Stadium_ID` WHERE `S`.`Stadium_ID` IN (SELECT `S`.`Stadium_ID` FROM `stadium` AS `S` ORDER BY (`Average` / `Capacity`) DESC LIMIT 3)\n\n* **Sub-question 2 (count of total concerts):**\n    * **SQL:** COUNT(*) FROM `concert`\n\n* **Main Question (percentage of concerts in top three stadiums):**\n    * **SQL:** SELECT (COUNT(*) FROM `concert` AS `C` INNER JOIN `stadium` AS `S` ON `C`.`Stadium_ID` = `S`.`Stadium_ID` WHERE `S`.`Stadium_ID` IN (SELECT `S`.`Stadium_ID` FROM `stadium` AS `S` ORDER BY (`Average` / `Capacity`) DESC LIMIT 3)) / (COUNT(*) FROM `concert`) * 100 AS percentage\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by combining the counts into a single query that calculates the percentage directly.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT (COUNT(T1.concert_ID) * 100.0 / (SELECT COUNT(T2.concert_ID) FROM concert AS T2 WHERE T2.Theme = 'Bleeding Love' AND T2.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Glebe Park'))) AS percentage  FROM concert AS T1  INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE T2.Stadium_ID IN (SELECT T3.Stadium_ID FROM stadium AS T3 ORDER BY (T3.Average * 1.0 / T3.Capacity) DESC LIMIT 3) ",
+                "plan": "**Question**: If the \"Bleeding Love\" themed concert was held at Glebe Park stadium, what percentage of the concerts were held in the top three stadiums in terms of average attendance rate?  \n**Evidence**: Attendance rate is calculated by dividing attendance amount by the capacity of the stadium.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** If the \"Bleeding Love\" themed concert was held at Glebe Park stadium, what percentage of the concerts were held in the top three stadiums in terms of average attendance rate?\n    * **Analysis:** We need to calculate the percentage of concerts held in the top three stadiums based on their average attendance rate. This involves two main calculations: determining the top three stadiums by average attendance rate and counting the total concerts held in those stadiums.\n    * **Pseudo SQL:** SELECT (COUNT(<concerts in top 3 stadiums>) / COUNT(<total concerts>)) * 100 AS percentage FROM <concerts> WHERE <Bleeding Love concert held at Glebe Park>\n\n    * **Sub-question 1:** Count of concerts in top three stadiums\n        * **Analysis:** We need to find the top three stadiums based on their average attendance rate. The average attendance rate can be calculated as `Average / Capacity`. We will then count the concerts held in these stadiums.\n        * **Pseudo SQL:** COUNT(T1.concert_ID) FROM concert AS T1 INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID WHERE T2.Stadium_ID IN (SELECT T3.Stadium_ID FROM stadium AS T3 ORDER BY (T3.Average / T3.Capacity) DESC LIMIT 3)\n\n    * **Sub-question 2:** Total count of concerts\n        * **Analysis:** We need to count all concerts, but we will also need to ensure that the \"Bleeding Love\" themed concert is included in our calculations.\n        * **Pseudo SQL:** COUNT(T1.concert_ID) FROM concert AS T1 WHERE T1.Theme = 'Bleeding Love' AND T1.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Glebe Park')\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (count of concerts in top three stadiums):**\n    * **SQL:** COUNT(T1.concert_ID) FROM concert AS T1 INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID WHERE T2.Stadium_ID IN (SELECT T3.Stadium_ID FROM stadium AS T3 ORDER BY (T3.Average / T3.Capacity) DESC LIMIT 3)\n\n* **Sub-question 2 (total count of concerts):**\n    * **SQL:** COUNT(T1.concert_ID) FROM concert AS T1 WHERE T1.Theme = 'Bleeding Love' AND T1.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Glebe Park')\n\n* **Main Question (percentage of concerts in top three stadiums):**\n    * **SQL:** SELECT (COUNT(T1.concert_ID) / (SELECT COUNT(T2.concert_ID) FROM concert AS T2 WHERE T2.Theme = 'Bleeding Love' AND T2.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Glebe Park'))) * 100 AS percentage FROM concert AS T1 INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID WHERE T2.Stadium_ID IN (SELECT T3.Stadium_ID FROM stadium AS T3 ORDER BY (T3.Average / T3.Capacity) DESC LIMIT 3)\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by ensuring that we only perform necessary joins and calculations without redundancy.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " WITH TopStadiums AS (     SELECT Stadium_ID     FROM (         SELECT Stadium_ID, SUM(Attendance) / Capacity AS Attendance_Rate         FROM concert         INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID         GROUP BY Stadium_ID     )     ORDER BY Attendance_Rate DESC     LIMIT 3 ) SELECT (COUNT(*) * 100.0 / (SELECT COUNT(*) FROM concert)) AS Percentage FROM concert WHERE Stadium_ID IN (SELECT Stadium_ID FROM TopStadiums) AND Theme = 'Bleeding Love'; ",
+                "plan": "**Question**: If the \"Bleeding Love\" themed concert was held at Glebe Park stadium, what percentage of the concerts were held in the top three stadiums in terms of average attendance rate?  \n**Evidence**: Attendance rate is calculated by dividing attendance amount by the capacity of the stadium.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** If the \"Bleeding Love\" themed concert was held at Glebe Park stadium, what percentage of the concerts were held in the top three stadiums in terms of average attendance rate?\n    * **Analysis:** We need to calculate the percentage of concerts held in the top three stadiums based on average attendance rate. This involves determining the average attendance rate for each stadium, identifying the top three stadiums, and then counting how many concerts were held in those stadiums.\n    * **Pseudo SQL:** SELECT (COUNT(*) / <total concerts>) * 100 FROM concert WHERE <stadium in top three> AND <concert theme is \"Bleeding Love\">\n\n    * **Sub-question 1:** Calculate average attendance rate for each stadium\n        * **Analysis:** The average attendance rate is calculated as the total attendance divided by the capacity of the stadium. We will need to join the `concert` and `stadium` tables to get the necessary data.\n        * **Pseudo SQL:** SELECT `Stadium_ID`, SUM(`Attendance`) / `Capacity` AS `Attendance_Rate` FROM concert INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID GROUP BY `Stadium_ID`\n\n    * **Sub-question 2:** Identify the top three stadiums based on average attendance rate\n        * **Analysis:** We will order the results from sub-question 1 by `Attendance_Rate` in descending order and limit the results to the top three.\n        * **Pseudo SQL:** SELECT `Stadium_ID` FROM (SELECT `Stadium_ID`, SUM(`Attendance`) / `Capacity` AS `Attendance_Rate` FROM concert INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID GROUP BY `Stadium_ID`) ORDER BY `Attendance_Rate` DESC LIMIT 3\n\n    * **Sub-question 3:** Count concerts held in the top three stadiums\n        * **Analysis:** We will count the concerts that were held in the stadiums identified in sub-question 2 and filter by the concert theme \"Bleeding Love\".\n        * **Pseudo SQL:** SELECT COUNT(*) FROM concert WHERE `Stadium_ID` IN (SELECT `Stadium_ID` FROM (SELECT `Stadium_ID`, SUM(`Attendance`) / `Capacity` AS `Attendance_Rate` FROM concert INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID GROUP BY `Stadium_ID`) ORDER BY `Attendance_Rate` DESC LIMIT 3) AND `Theme` = 'Bleeding Love'\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (average attendance rate for each stadium):**\n    * **SQL:** SELECT `Stadium_ID`, SUM(`Attendance`) / `Capacity` AS `Attendance_Rate` FROM concert INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID GROUP BY `Stadium_ID`\n\n* **Sub-question 2 (top three stadiums):**\n    * **SQL:** SELECT `Stadium_ID` FROM (SELECT `Stadium_ID`, SUM(`Attendance`) / `Capacity` AS `Attendance_Rate` FROM concert INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID GROUP BY `Stadium_ID`) ORDER BY `Attendance_Rate` DESC LIMIT 3\n\n* **Sub-question 3 (count concerts in top three stadiums):**\n    * **SQL:** SELECT COUNT(*) FROM concert WHERE `Stadium_ID` IN (SELECT `Stadium_ID` FROM (SELECT `Stadium_ID`, SUM(`Attendance`) / `Capacity` AS `Attendance_Rate` FROM concert INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID GROUP BY `Stadium_ID`) ORDER BY `Attendance_Rate` DESC LIMIT 3) AND `Theme` = 'Bleeding Love'\n\n* **Main Question (percentage of concerts):**\n    * **SQL:** SELECT (COUNT(*) / (SELECT COUNT(*) FROM concert)) * 100 FROM concert WHERE `Stadium_ID` IN (SELECT `Stadium_ID` FROM (SELECT `Stadium_ID`, SUM(`Attendance`) / `Capacity` AS `Attendance_Rate` FROM concert INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID GROUP BY `Stadium_ID`) ORDER BY `Attendance_Rate` DESC LIMIT 3) AND `Theme` = 'Bleeding Love'\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by combining the calculations into a single query with a `WITH` clause to improve readability and performance.\n\n**Final Optimized SQL Query:**\n\n"
+            }
+        ],
+        "status": "success",
+        "execution_time": 9.9
+    },
+    {
+        "tool_name": "revise",
+        "original_SQL_id": "generate_candidate",
+        "refined_SQL_id": "revise_1",
+        "candidates": [
+            {
+                "refined_query": " SELECT (COUNT(C.concert_ID) * 100.0 / (SELECT COUNT(*) FROM concert)) AS percentage  FROM concert AS C  INNER JOIN stadium AS S ON C.Stadium_ID = S.Stadium_ID  WHERE S.Stadium_ID IN (SELECT S.Stadium_ID FROM stadium AS S ORDER BY (Average * 1.0 / Capacity) DESC LIMIT 3) "
+            },
+            {
+                "refined_query": " SELECT (COUNT(T1.concert_ID) * 100.0 / (SELECT COUNT(T2.concert_ID) FROM concert AS T2 WHERE T2.Theme = 'Bleeding Love' AND T2.Stadium_ID = (SELECT Stadium_ID FROM stadium WHERE Name = 'Glebe Park'))) AS percentage  FROM concert AS T1  INNER JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID  WHERE T2.Stadium_ID IN (SELECT T3.Stadium_ID FROM stadium AS T3 ORDER BY (T3.Average * 1.0 / T3.Capacity) DESC LIMIT 3) "
+            },
+            {
+                "refined_query": " WITH TopStadiums AS (SELECT stadium.Stadium_ID FROM (SELECT stadium.Stadium_ID, SUM(Attendance) / stadium.Capacity AS Attendance_Rate FROM concert INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID GROUP BY stadium.Stadium_ID) ORDER BY Attendance_Rate DESC LIMIT 3) SELECT (COUNT(*) * 100.0 / (SELECT COUNT(*) FROM concert)) AS Percentage FROM concert WHERE concert.Stadium_ID IN (SELECT Stadium_ID FROM TopStadiums) AND concert.Theme = 'Bleeding Love'; "
+            }
+        ],
+        "status": "success",
+        "execution_time": 8.8
+    },
+    {
+        "tool_name": "execution_accuracy",
+        "generate_candidate": {
+            "exec_res": 1,
+            "exec_err": "--",
+            "Question": "If the \"Bleeding Love\" themed concert was held at Glebe Park stadium, what percentage of the concerts were held in the top three stadiums in terms of average attendance rate?",
+            "Evidence": "Attendance rate is calculated by divding attendance amount by the capacity of the stadium.",
+            "GOLD_SQL": "SELECT 100.0 * COUNT ( * ) / ( SELECT COUNT ( * ) FROM concert ) AS percent FROM ( SELECT Stadium_ID FROM stadium WHERE Name = \"Glebe Park\" UNION ALL SELECT Stadium_ID FROM concert WHERE Theme != \"Bleeding Love\" ) WHERE Stadium_ID IN ( SELECT Stadium_ID FROM stadium ORDER BY 100.0 * Average / Capacity DESC LIMIT 3 )",
+            "PREDICTED_SQL": " SELECT (COUNT(C.concert_ID) * 100.0 / (SELECT COUNT(*) FROM concert)) AS percentage  FROM concert AS C  INNER JOIN stadium AS S ON C.Stadium_ID = S.Stadium_ID  WHERE S.Stadium_ID IN (SELECT S.Stadium_ID FROM stadium AS S ORDER BY (Average * 1.0 / Capacity) DESC LIMIT 3) "
+        },
+        "revise_1": {
+            "exec_res": 1,
+            "exec_err": "--",
+            "Question": "If the \"Bleeding Love\" themed concert was held at Glebe Park stadium, what percentage of the concerts were held in the top three stadiums in terms of average attendance rate?",
+            "Evidence": "Attendance rate is calculated by divding attendance amount by the capacity of the stadium.",
+            "GOLD_SQL": "SELECT 100.0 * COUNT ( * ) / ( SELECT COUNT ( * ) FROM concert ) AS percent FROM ( SELECT Stadium_ID FROM stadium WHERE Name = \"Glebe Park\" UNION ALL SELECT Stadium_ID FROM concert WHERE Theme != \"Bleeding Love\" ) WHERE Stadium_ID IN ( SELECT Stadium_ID FROM stadium ORDER BY 100.0 * Average / Capacity DESC LIMIT 3 )",
+            "PREDICTED_SQL": " SELECT (COUNT(C.concert_ID) * 100.0 / (SELECT COUNT(*) FROM concert)) AS percentage  FROM concert AS C  INNER JOIN stadium AS S ON C.Stadium_ID = S.Stadium_ID  WHERE S.Stadium_ID IN (SELECT S.Stadium_ID FROM stadium AS S ORDER BY (Average * 1.0 / Capacity) DESC LIMIT 3) "
+        },
+        "final_SQL": {
+            "exec_res": 1,
+            "exec_err": "--",
+            "Question": "If the \"Bleeding Love\" themed concert was held at Glebe Park stadium, what percentage of the concerts were held in the top three stadiums in terms of average attendance rate?",
+            "Evidence": "Attendance rate is calculated by divding attendance amount by the capacity of the stadium.",
+            "GOLD_SQL": "SELECT 100.0 * COUNT ( * ) / ( SELECT COUNT ( * ) FROM concert ) AS percent FROM ( SELECT Stadium_ID FROM stadium WHERE Name = \"Glebe Park\" UNION ALL SELECT Stadium_ID FROM concert WHERE Theme != \"Bleeding Love\" ) WHERE Stadium_ID IN ( SELECT Stadium_ID FROM stadium ORDER BY 100.0 * Average / Capacity DESC LIMIT 3 )",
+            "PREDICTED_SQL": " SELECT (COUNT(C.concert_ID) * 100.0 / (SELECT COUNT(*) FROM concert)) AS percentage  FROM concert AS C  INNER JOIN stadium AS S ON C.Stadium_ID = S.Stadium_ID  WHERE S.Stadium_ID IN (SELECT S.Stadium_ID FROM stadium AS S ORDER BY (Average * 1.0 / Capacity) DESC LIMIT 3) "
+        },
+        "status": "success",
+        "execution_time": 0.0
+    }
+]

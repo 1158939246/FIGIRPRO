@@ -1,0 +1,250 @@
+[
+    {
+        "tool_name": "extract_keywords",
+        "keywords": [
+            "stadiums",
+            "lowest average attendance rates",
+            "highest average attendance rates",
+            "average attendance rates",
+            "concerts",
+            "attendance amount",
+            "capacity",
+            "attendance rate"
+        ],
+        "status": "success",
+        "execution_time": 5.9
+    },
+    {
+        "tool_name": "retrieve_entity",
+        "similar_columns": {
+            "stadium": [
+                "Capacity",
+                "Lowest",
+                "Average",
+                "Highest"
+            ]
+        },
+        "schema_with_examples": {},
+        "status": "success",
+        "execution_time": 2.5
+    },
+    {
+        "tool_name": "retrieve_context",
+        "schema_with_descriptions": {},
+        "status": "success",
+        "execution_time": 12.7
+    },
+    {
+        "tool_name": "filter_column",
+        "tentative_schema": {
+            "stadium": [
+                "Stadium_ID",
+                "Location",
+                "Name",
+                "Capacity",
+                "Highest",
+                "Lowest",
+                "Average"
+            ],
+            "singer": [],
+            "concert": [
+                "concert_ID",
+                "Stadium_ID"
+            ],
+            "singer_in_concert": [
+                "concert_ID"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "stadium": [
+                "name",
+                "stadium_id",
+                "capacity",
+                "average"
+            ],
+            "concert": [
+                "stadium_id"
+            ]
+        },
+        "status": "success",
+        "execution_time": 27.9
+    },
+    {
+        "tool_name": "select_tables",
+        "chain_of_thought_reasoning": "To answer the question about which stadiums have the lowest and highest average attendance rates and how many concerts they have held, we need to analyze the attendance data in relation to the stadium capacity. The 'stadium' table is essential because it contains the 'Capacity' column, which is necessary for calculating the attendance rate. The 'concert' table is also required to link concerts to their respective stadiums via the 'Stadium_ID' foreign key. Finally, the 'singer_in_concert' table is needed to count the number of concerts held at each stadium, as it connects singers to concerts and indirectly to stadiums through the concert table. Therefore, all three tables are necessary to gather the required data for the SQL query.",
+        "selected_tables": [
+            "stadium",
+            "concert",
+            "singer_in_concert"
+        ],
+        "tentative_schema": {
+            "stadium": [
+                "Stadium_ID",
+                "Location",
+                "Name",
+                "Capacity",
+                "Highest",
+                "Lowest",
+                "Average"
+            ],
+            "concert": [
+                "concert_ID",
+                "Stadium_ID"
+            ],
+            "singer_in_concert": [
+                "concert_ID"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "stadium": [
+                "name",
+                "stadium_id",
+                "capacity",
+                "average"
+            ],
+            "concert": [
+                "stadium_id"
+            ]
+        },
+        "status": "success",
+        "execution_time": 6.1
+    },
+    {
+        "tool_name": "select_columns",
+        "chain_of_thought_reasoning": "To determine which stadiums have the lowest and highest average attendance rates and how many concerts they have held, we need to calculate the attendance rate using the capacity of the stadium and the attendance amount from the concerts. The necessary columns include the stadium's capacity, the average attendance, and the stadium ID to link concerts to their respective stadiums. Additionally, we need the concert ID to count the number of concerts held at each stadium.",
+        "selected_columns": {
+            "stadium": [
+                "Capacity",
+                "Average",
+                "Stadium_ID"
+            ],
+            "concert": [
+                "concert_ID"
+            ],
+            "singer_in_concert": [
+                "concert_ID"
+            ]
+        },
+        "tentative_schema": {
+            "stadium": [
+                "Capacity",
+                "Average",
+                "Stadium_ID"
+            ],
+            "concert": [
+                "concert_ID"
+            ],
+            "singer_in_concert": [
+                "concert_ID"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'stadium'.'name'",
+            "'concert'.'stadium_id'"
+        ],
+        "correct_columns": {
+            "stadium": [
+                "name",
+                "stadium_id",
+                "capacity",
+                "average"
+            ],
+            "concert": [
+                "stadium_id"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.3
+    },
+    {
+        "tool_name": "generate_candidate",
+        "node_type": "generate_candidate",
+        "generation_based_candidates": [
+            {
+                "template_name": "generate_candidate_one",
+                "candidates": [
+                    " SELECT T1.\"Name\", AVG(T1.\"Average\" / T1.\"Capacity\") AS \"Attendance_Rate\", COUNT(T2.\"concert_ID\") AS \"Concert_Count\" FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\" HAVING \"Attendance_Rate\" = (SELECT MIN(AVG(T1.\"Average\" / T1.\"Capacity\")) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\") OR \"Attendance_Rate\" = (SELECT MAX(AVG(T1.\"Average\" / T1.\"Capacity\")) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\") ",
+                    " WITH AttendanceRates AS (     SELECT stadium.Name,             (SUM(singer_in_concert.attendance) / stadium.Capacity) AS average_attendance_rate,             COUNT(concert.concert_ID) AS concert_count      FROM stadium      INNER JOIN concert ON stadium.Stadium_ID = concert.Stadium_ID      INNER JOIN singer_in_concert ON concert.concert_ID = singer_in_concert.concert_ID      GROUP BY stadium.Name ) SELECT Name, concert_count FROM AttendanceRates  WHERE average_attendance_rate = (SELECT MIN(average_attendance_rate) FROM AttendanceRates) UNION ALL SELECT Name, concert_count FROM AttendanceRates  WHERE average_attendance_rate = (SELECT MAX(average_attendance_rate) FROM AttendanceRates); ",
+                    " WITH AverageAttendance AS (     SELECT stadium.Stadium_ID,             SUM(stadium.Average) AS total_attendance,             stadium.Capacity,             COUNT(concert.concert_ID) AS concert_count      FROM concert      INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID      GROUP BY stadium.Stadium_ID ) SELECT stadium.Name, concert_count  FROM AverageAttendance  WHERE (total_attendance / Capacity) = (SELECT MIN(total_attendance * 1.0 / Capacity) FROM AverageAttendance)     OR (total_attendance / Capacity) = (SELECT MAX(total_attendance * 1.0 / Capacity) FROM AverageAttendance); "
+                ]
+            }
+        ],
+        "candidates": [
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT T1.\"Name\", AVG(T1.\"Average\" / T1.\"Capacity\") AS \"Attendance_Rate\", COUNT(T2.\"concert_ID\") AS \"Concert_Count\" FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\" HAVING \"Attendance_Rate\" = (SELECT MIN(AVG(T1.\"Average\" / T1.\"Capacity\")) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\") OR \"Attendance_Rate\" = (SELECT MAX(AVG(T1.\"Average\" / T1.\"Capacity\")) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\") ",
+                "plan": "**Question**: Which stadiums have the lowest and highest average attendance rates respectively, and how many concerts have they each held?  \n**Evidence**: Attendance rate is calculated by dividing attendance amount by the capacity of the stadium.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** Which stadiums have the lowest and highest average attendance rates respectively, and how many concerts have they each held?\n    * **Analysis:** We need to calculate the average attendance rate for each stadium, which is derived from the total attendance divided by the capacity. We will also need to count the number of concerts held at each stadium. The results will be filtered to find the stadiums with the lowest and highest average attendance rates.\n    * **Pseudo SQL:** \n    ```sql\n    SELECT T1.\"Name\", AVG(T1.\"Average\" / T1.\"Capacity\") AS \"Attendance_Rate\", COUNT(T2.\"concert_ID\") AS \"Concert_Count\"\n    FROM stadium AS T1\n    LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\"\n    GROUP BY T1.\"Stadium_ID\"\n    HAVING \"Attendance_Rate\" = (SELECT MIN(AVG(T1.\"Average\" / T1.\"Capacity\")) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\")\n    OR \"Attendance_Rate\" = (SELECT MAX(AVG(T1.\"Average\" / T1.\"Capacity\")) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\")\n    ```\n\n* **Sub-question 1:** Calculate average attendance rate for each stadium\n    * **Analysis:** The average attendance rate is calculated by dividing the total attendance (from the \"Average\" column) by the capacity of the stadium.\n    * **Pseudo SQL:** \n    ```sql\n    AVG(T1.\"Average\" / T1.\"Capacity\")\n    ```\n\n* **Sub-question 2:** Count the number of concerts held at each stadium\n    * **Analysis:** This can be done by counting the `concert_ID` from the `concert` table, grouped by `Stadium_ID`.\n    * **Pseudo SQL:** \n    ```sql\n    COUNT(T2.\"concert_ID\")\n    ```\n\n* **Sub-question 3:** Identify the stadiums with the lowest and highest average attendance rates\n    * **Analysis:** We will use the `HAVING` clause to filter the results based on the minimum and maximum average attendance rates calculated in the main query.\n    * **Pseudo SQL:** \n    ```sql\n    HAVING \"Attendance_Rate\" = (SELECT MIN(AVG(T1.\"Average\" / T1.\"Capacity\")) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\")\n    OR \"Attendance_Rate\" = (SELECT MAX(AVG(T1.\"Average\" / T1.\"Capacity\")) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\")\n    ```\n\n**2. Assembling SQL:**\n\n* **Main Question (final SQL):**\n    * **SQL:** \n    ```sql\n    SELECT T1.\"Name\", AVG(T1.\"Average\" / T1.\"Capacity\") AS \"Attendance_Rate\", COUNT(T2.\"concert_ID\") AS \"Concert_Count\"\n    FROM stadium AS T1\n    LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\"\n    GROUP BY T1.\"Stadium_ID\"\n    HAVING \"Attendance_Rate\" = (SELECT MIN(AVG(T1.\"Average\" / T1.\"Capacity\")) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\")\n    OR \"Attendance_Rate\" = (SELECT MAX(AVG(T1.\"Average\" / T1.\"Capacity\")) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\")\n    ```\n\n**3. Simplification and Optimization:**\n\n* The SQL query is already structured efficiently, using `LEFT JOIN` to ensure all stadiums are included even if they have no concerts. The use of `HAVING` allows us to filter for both the minimum and maximum attendance rates in one query.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " WITH AttendanceRates AS (     SELECT stadium.Name,             (SUM(singer_in_concert.attendance) / stadium.Capacity) AS average_attendance_rate,             COUNT(concert.concert_ID) AS concert_count      FROM stadium      INNER JOIN concert ON stadium.Stadium_ID = concert.Stadium_ID      INNER JOIN singer_in_concert ON concert.concert_ID = singer_in_concert.concert_ID      GROUP BY stadium.Name ) SELECT Name, concert_count FROM AttendanceRates  WHERE average_attendance_rate = (SELECT MIN(average_attendance_rate) FROM AttendanceRates) UNION ALL SELECT Name, concert_count FROM AttendanceRates  WHERE average_attendance_rate = (SELECT MAX(average_attendance_rate) FROM AttendanceRates); ",
+                "plan": "**Question**: Which stadiums have the lowest and highest average attendance rates respectively, and how many concerts have they each held?  \n**Evidence**: Attendance rate is calculated by dividing attendance amount by the capacity of the stadium.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** Which stadiums have the lowest and highest average attendance rates respectively, and how many concerts have they each held?\n    * **Analysis:** We need to calculate the average attendance rate for each stadium, which requires joining the `stadium`, `concert`, and `singer_in_concert` tables. We will then find the stadiums with the lowest and highest average attendance rates and count the number of concerts held at each.\n    * **Pseudo SQL:** \n    ```sql\n    SELECT stadium.Name, COUNT(concert.concert_ID) AS concert_count \n    FROM stadium \n    INNER JOIN concert ON stadium.Stadium_ID = concert.Stadium_ID \n    INNER JOIN singer_in_concert ON concert.concert_ID = singer_in_concert.concert_ID \n    GROUP BY stadium.Name \n    ORDER BY (SUM(singer_in_concert.attendance) / stadium.Capacity) ASC \n    LIMIT 1\n    ```\n\n* **Sub-question 1:** Calculate average attendance rate for each stadium.\n    * **Analysis:** We need to sum the attendance from `singer_in_concert` and divide it by the capacity of the stadium.\n    * **Pseudo SQL:** \n    ```sql\n    (SUM(singer_in_concert.attendance) / stadium.Capacity) AS average_attendance_rate\n    ```\n\n* **Sub-question 2:** Find the stadium with the lowest average attendance rate.\n    * **Analysis:** We will order the results by average attendance rate in ascending order and limit the results to 1.\n    * **Pseudo SQL:** \n    ```sql\n    ORDER BY average_attendance_rate ASC LIMIT 1\n    ```\n\n* **Sub-question 3:** Find the stadium with the highest average attendance rate.\n    * **Analysis:** Similar to sub-question 2, but we will order the results in descending order.\n    * **Pseudo SQL:** \n    ```sql\n    ORDER BY average_attendance_rate DESC LIMIT 1\n    ```\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (average attendance rate):**\n    * **SQL:** \n    ```sql\n    (SUM(singer_in_concert.attendance) / stadium.Capacity) AS average_attendance_rate\n    ```\n\n* **Sub-question 2 (lowest average attendance rate):**\n    * **SQL:** \n    ```sql\n    SELECT stadium.Name, COUNT(concert.concert_ID) AS concert_count \n    FROM stadium \n    INNER JOIN concert ON stadium.Stadium_ID = concert.Stadium_ID \n    INNER JOIN singer_in_concert ON concert.concert_ID = singer_in_concert.concert_ID \n    GROUP BY stadium.Name \n    ORDER BY (SUM(singer_in_concert.attendance) / stadium.Capacity) ASC \n    LIMIT 1\n    ```\n\n* **Sub-question 3 (highest average attendance rate):**\n    * **SQL:** \n    ```sql\n    SELECT stadium.Name, COUNT(concert.concert_ID) AS concert_count \n    FROM stadium \n    INNER JOIN concert ON stadium.Stadium_ID = concert.Stadium_ID \n    INNER JOIN singer_in_concert ON concert.concert_ID = singer_in_concert.concert_ID \n    GROUP BY stadium.Name \n    ORDER BY (SUM(singer_in_concert.attendance) / stadium.Capacity) DESC \n    LIMIT 1\n    ```\n\n* **Main Question (combine results):**\n    * **SQL:** \n    ```sql\n    SELECT stadium.Name, COUNT(concert.concert_ID) AS concert_count \n    FROM stadium \n    INNER JOIN concert ON stadium.Stadium_ID = concert.Stadium_ID \n    INNER JOIN singer_in_concert ON concert.concert_ID = singer_in_concert.concert_ID \n    GROUP BY stadium.Name \n    ORDER BY (SUM(singer_in_concert.attendance) / stadium.Capacity) ASC \n    LIMIT 1\n    UNION ALL\n    SELECT stadium.Name, COUNT(concert.concert_ID) AS concert_count \n    FROM stadium \n    INNER JOIN concert ON stadium.Stadium_ID = concert.Stadium_ID \n    INNER JOIN singer_in_concert ON concert.concert_ID = singer_in_concert.concert_ID \n    GROUP BY stadium.Name \n    ORDER BY (SUM(singer_in_concert.attendance) / stadium.Capacity) DESC \n    LIMIT 1\n    ```\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by using a Common Table Expression (CTE) to calculate the average attendance rates first, and then selecting the lowest and highest from that result.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " WITH AverageAttendance AS (     SELECT stadium.Stadium_ID,             SUM(stadium.Average) AS total_attendance,             stadium.Capacity,             COUNT(concert.concert_ID) AS concert_count      FROM concert      INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID      GROUP BY stadium.Stadium_ID ) SELECT stadium.Name, concert_count  FROM AverageAttendance  WHERE (total_attendance / Capacity) = (SELECT MIN(total_attendance * 1.0 / Capacity) FROM AverageAttendance)     OR (total_attendance / Capacity) = (SELECT MAX(total_attendance * 1.0 / Capacity) FROM AverageAttendance); ",
+                "plan": "**Question**: Which stadiums have the lowest and highest average attendance rates respectively, and how many concerts have they each held?  \n**Evidence**: Attendance rate is calculated by dividing attendance amount by the capacity of the stadium.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** Which stadiums have the lowest and highest average attendance rates respectively, and how many concerts have they each held?\n    * **Analysis:** We need to calculate the average attendance rate for each stadium, which involves joining the `concert` and `stadium` tables. We will then find the stadiums with the lowest and highest average attendance rates and count the number of concerts held at each.\n    * **Pseudo SQL:** \n    ```sql\n    SELECT stadium.Name, COUNT(concert.concert_ID) AS concert_count \n    FROM concert \n    INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID \n    GROUP BY stadium.Stadium_ID \n    HAVING <lowest and highest average attendance rates>\n    ```\n\n* **Sub-question 1:** Calculate average attendance rate for each stadium.\n    * **Analysis:** The average attendance rate can be calculated as the total attendance divided by the stadium's capacity. We need to sum the attendance for each concert and divide it by the capacity of the stadium.\n    * **Pseudo SQL:** \n    ```sql\n    AVG(attendance) / stadium.Capacity\n    ```\n\n* **Sub-question 2:** Identify the lowest and highest average attendance rates.\n    * **Analysis:** We will need to find the minimum and maximum values of the average attendance rates calculated in the previous step.\n    * **Pseudo SQL:** \n    ```sql\n    MIN(average_attendance_rate) AND MAX(average_attendance_rate)\n    ```\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (average attendance rate):**\n    * **SQL:** \n    ```sql\n    SELECT stadium.Name, \n           SUM(stadium.Average) / COUNT(concert.concert_ID) AS average_attendance_rate \n    FROM concert \n    INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID \n    GROUP BY stadium.Stadium_ID\n    ```\n\n* **Sub-question 2 (lowest and highest average attendance rates):**\n    * **SQL:** \n    ```sql\n    SELECT MIN(average_attendance_rate) AS lowest_rate, \n           MAX(average_attendance_rate) AS highest_rate \n    FROM (SELECT SUM(stadium.Average) / COUNT(concert.concert_ID) AS average_attendance_rate \n          FROM concert \n          INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID \n          GROUP BY stadium.Stadium_ID)\n    ```\n\n* **Main Question (stadiums with lowest and highest average attendance rates):**\n    * **SQL:** \n    ```sql\n    SELECT stadium.Name, COUNT(concert.concert_ID) AS concert_count \n    FROM concert \n    INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID \n    GROUP BY stadium.Stadium_ID \n    HAVING AVG(stadium.Average) / stadium.Capacity = (SELECT MIN(average_attendance_rate) FROM (SELECT SUM(stadium.Average) / COUNT(concert.concert_ID) AS average_attendance_rate FROM concert INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID GROUP BY stadium.Stadium_ID)) \n    OR AVG(stadium.Average) / stadium.Capacity = (SELECT MAX(average_attendance_rate) FROM (SELECT SUM(stadium.Average) / COUNT(concert.concert_ID) AS average_attendance_rate FROM concert INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID GROUP BY stadium.Stadium_ID))\n    ```\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by calculating the average attendance rate directly in the main query and using a `WITH` clause to improve readability.\n\n**Final Optimized SQL Query:**\n\n"
+            }
+        ],
+        "status": "success",
+        "execution_time": 28.6
+    },
+    {
+        "tool_name": "revise",
+        "original_SQL_id": "generate_candidate",
+        "refined_SQL_id": "revise_1",
+        "candidates": [
+            {
+                "refined_query": " SELECT T1.\"Name\", AVG(T1.\"Average\" / T1.\"Capacity\") AS \"Attendance_Rate\", COUNT(T2.\"concert_ID\") AS \"Concert_Count\" FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\" HAVING AVG(T1.\"Average\" / T1.\"Capacity\") = (SELECT MIN(AvgRate) FROM (SELECT AVG(T1.\"Average\" / T1.\"Capacity\") AS AvgRate FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID)) OR AVG(T1.\"Average\" / T1.\"Capacity\") = (SELECT MAX(AvgRate) FROM (SELECT AVG(T1.\"Average\" / T1.\"Capacity\") AS AvgRate FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\")) "
+            },
+            {
+                "refined_query": " WITH AttendanceRates AS (SELECT stadium.Name, (COUNT(concert.concert_ID) / stadium.Capacity) AS average_attendance_rate, COUNT(concert.concert_ID) AS concert_count FROM stadium INNER JOIN concert ON stadium.Stadium_ID = concert.Stadium_ID GROUP BY stadium.Name) SELECT Name, concert_count FROM AttendanceRates WHERE average_attendance_rate = (SELECT MIN(average_attendance_rate) FROM AttendanceRates) UNION ALL SELECT Name, concert_count FROM AttendanceRates WHERE average_attendance_rate = (SELECT MAX(average_attendance_rate) FROM AttendanceRates); "
+            },
+            {
+                "refined_query": " WITH AverageAttendance AS (SELECT stadium.Stadium_ID, stadium.Name, SUM(stadium.Average) AS total_attendance, stadium.Capacity, COUNT(concert.concert_ID) AS concert_count FROM concert INNER JOIN stadium ON concert.Stadium_ID = stadium.Stadium_ID GROUP BY stadium.Stadium_ID, stadium.Name) SELECT Name, concert_count FROM AverageAttendance WHERE (total_attendance / Capacity) = (SELECT MIN(total_attendance * 1.0 / Capacity) FROM AverageAttendance) OR (total_attendance / Capacity) = (SELECT MAX(total_attendance * 1.0 / Capacity) FROM AverageAttendance); "
+            }
+        ],
+        "status": "success",
+        "execution_time": 9.7
+    },
+    {
+        "tool_name": "execution_accuracy",
+        "generate_candidate": {
+            "exec_res": 0,
+            "exec_err": "misuse of aggregate function AVG()",
+            "Question": "Which stadiums have the lowest and highest average attendance rates respectively, and how many concerts have they each held?",
+            "Evidence": "Attendance rate is calculated by divding attendance amount by the capacity of the stadium.",
+            "GOLD_SQL": "SELECT * FROM ( SELECT Name AS highest_name FROM stadium GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity DESC LIMIT 1 ) JOIN ( SELECT COUNT ( * ) AS concerts_in_highest_stadium FROM stadium A JOIN concert B ON A.Stadium_ID = B.Stadium_ID WHERE A.Stadium_ID = ( SELECT Stadium_ID FROM stadium GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity DESC LIMIT 1 ) ) JOIN ( SELECT Name AS lowest_name FROM stadium GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity ASC LIMIT 1 ) JOIN ( SELECT COUNT ( * ) AS concerts_in_lowest_stadium FROM stadium A JOIN concert B ON A.Stadium_ID = B.Stadium_ID WHERE A.Stadium_ID = ( SELECT Stadium_ID FROM stadium GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity ASC LIMIT 1 ) )",
+            "PREDICTED_SQL": " SELECT T1.\"Name\", AVG(T1.\"Average\" / T1.\"Capacity\") AS \"Attendance_Rate\", COUNT(T2.\"concert_ID\") AS \"Concert_Count\" FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\" HAVING \"Attendance_Rate\" = (SELECT MIN(AVG(T1.\"Average\" / T1.\"Capacity\")) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\") OR \"Attendance_Rate\" = (SELECT MAX(AVG(T1.\"Average\" / T1.\"Capacity\")) FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\") "
+        },
+        "revise_1": {
+            "exec_res": 0,
+            "exec_err": "near \"Average\": syntax error",
+            "Question": "Which stadiums have the lowest and highest average attendance rates respectively, and how many concerts have they each held?",
+            "Evidence": "Attendance rate is calculated by divding attendance amount by the capacity of the stadium.",
+            "GOLD_SQL": "SELECT * FROM ( SELECT Name AS highest_name FROM stadium GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity DESC LIMIT 1 ) JOIN ( SELECT COUNT ( * ) AS concerts_in_highest_stadium FROM stadium A JOIN concert B ON A.Stadium_ID = B.Stadium_ID WHERE A.Stadium_ID = ( SELECT Stadium_ID FROM stadium GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity DESC LIMIT 1 ) ) JOIN ( SELECT Name AS lowest_name FROM stadium GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity ASC LIMIT 1 ) JOIN ( SELECT COUNT ( * ) AS concerts_in_lowest_stadium FROM stadium A JOIN concert B ON A.Stadium_ID = B.Stadium_ID WHERE A.Stadium_ID = ( SELECT Stadium_ID FROM stadium GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity ASC LIMIT 1 ) )",
+            "PREDICTED_SQL": " SELECT T1.\"Name\", AVG(T1.\"Average\" / T1.\"Capacity\") AS \"Attendance_Rate\", COUNT(T2.\"concert_ID\") AS \"Concert_Count\" FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\" HAVING AVG(T1.\"Average\" / T1.\"Capacity\") = (SELECT MIN(AvgRate) FROM (SELECT AVG(T1.\"Average\" / T1.\"Capacity\") AS AvgRate FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID)) OR AVG(T1.\"Average\" / T1.\"Capacity\") = (SELECT MAX(AvgRate) FROM (SELECT AVG(T1.\"Average\" / T1.\"Capacity\") AS AvgRate FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\")) "
+        },
+        "final_SQL": {
+            "exec_res": 0,
+            "exec_err": "near \"Average\": syntax error",
+            "Question": "Which stadiums have the lowest and highest average attendance rates respectively, and how many concerts have they each held?",
+            "Evidence": "Attendance rate is calculated by divding attendance amount by the capacity of the stadium.",
+            "GOLD_SQL": "SELECT * FROM ( SELECT Name AS highest_name FROM stadium GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity DESC LIMIT 1 ) JOIN ( SELECT COUNT ( * ) AS concerts_in_highest_stadium FROM stadium A JOIN concert B ON A.Stadium_ID = B.Stadium_ID WHERE A.Stadium_ID = ( SELECT Stadium_ID FROM stadium GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity DESC LIMIT 1 ) ) JOIN ( SELECT Name AS lowest_name FROM stadium GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity ASC LIMIT 1 ) JOIN ( SELECT COUNT ( * ) AS concerts_in_lowest_stadium FROM stadium A JOIN concert B ON A.Stadium_ID = B.Stadium_ID WHERE A.Stadium_ID = ( SELECT Stadium_ID FROM stadium GROUP BY Stadium_ID ORDER BY 100.0 * Average / Capacity ASC LIMIT 1 ) )",
+            "PREDICTED_SQL": " SELECT T1.\"Name\", AVG(T1.\"Average\" / T1.\"Capacity\") AS \"Attendance_Rate\", COUNT(T2.\"concert_ID\") AS \"Concert_Count\" FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\" HAVING AVG(T1.\"Average\" / T1.\"Capacity\") = (SELECT MIN(AvgRate) FROM (SELECT AVG(T1.\"Average\" / T1.\"Capacity\") AS AvgRate FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID)) OR AVG(T1.\"Average\" / T1.\"Capacity\") = (SELECT MAX(AvgRate) FROM (SELECT AVG(T1.\"Average\" / T1.\"Capacity\") AS AvgRate FROM stadium AS T1 LEFT JOIN concert AS T2 ON T1.\"Stadium_ID\" = T2.\"Stadium_ID\" GROUP BY T1.\"Stadium_ID\")) "
+        },
+        "status": "success",
+        "execution_time": 0.0
+    }
+]

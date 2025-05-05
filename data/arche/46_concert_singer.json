@@ -1,0 +1,293 @@
+[
+    {
+        "tool_name": "extract_keywords",
+        "keywords": [
+            "singer",
+            "Joe Sharp",
+            "concert",
+            "IDs",
+            "names",
+            "concerts",
+            "after 2012",
+            "more singers",
+            "Happy Tonight",
+            "themed concert",
+            "how many times"
+        ],
+        "status": "success",
+        "execution_time": 1.3
+    },
+    {
+        "tool_name": "retrieve_entity",
+        "similar_columns": {
+            "concert": [
+                "Theme"
+            ],
+            "singer": [
+                "Name"
+            ],
+            "stadium": [
+                "Name"
+            ]
+        },
+        "schema_with_examples": {
+            "singer": {
+                "Song_release_year": [
+                    "2013"
+                ],
+                "Name": [
+                    "Joe Sharp"
+                ]
+            },
+            "concert": {
+                "Theme": [
+                    "Happy Tonight"
+                ]
+            }
+        },
+        "status": "success",
+        "execution_time": 2.4
+    },
+    {
+        "tool_name": "retrieve_context",
+        "schema_with_descriptions": {},
+        "status": "success",
+        "execution_time": 35.3
+    },
+    {
+        "tool_name": "filter_column",
+        "tentative_schema": {
+            "stadium": [
+                "Stadium_ID",
+                "Name"
+            ],
+            "singer": [
+                "Singer_ID",
+                "Name"
+            ],
+            "concert": [
+                "concert_ID",
+                "concert_Name",
+                "Theme",
+                "Stadium_ID",
+                "Year"
+            ],
+            "singer_in_concert": [
+                "concert_ID",
+                "Singer_ID"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'singer'.'Joe Sharp'"
+        ],
+        "correct_columns": {
+            "singer": [
+                "singer_id",
+                "name",
+                "Joe Sharp"
+            ],
+            "concert": [
+                "concert_id",
+                "theme",
+                "concert_name",
+                "year"
+            ],
+            "singer_in_concert": [
+                "concert_id",
+                "singer_id"
+            ]
+        },
+        "status": "success",
+        "execution_time": 6.6
+    },
+    {
+        "tool_name": "select_tables",
+        "chain_of_thought_reasoning": "To answer the question, we need to identify concerts held after 2012 that have more singers than the 'Happy Tonight' themed concert. The 'concert' table is essential because it contains the concert details, including the year and theme. The 'singer_in_concert' table is necessary to determine the number of singers for each concert, as it links singers to concerts. The 'singer' table is needed to confirm that Joe Sharp performed in every concert, as it provides the names of the singers. Therefore, all three tables are required to gather the necessary information to answer the question effectively.",
+        "selected_tables": [
+            "concert",
+            "singer_in_concert",
+            "singer"
+        ],
+        "tentative_schema": {
+            "concert": [
+                "concert_ID",
+                "concert_Name",
+                "Theme",
+                "Stadium_ID",
+                "Year"
+            ],
+            "singer_in_concert": [
+                "concert_ID",
+                "Singer_ID"
+            ],
+            "singer": [
+                "Singer_ID",
+                "Name"
+            ],
+            "stadium": [
+                "Name"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'singer'.'Joe Sharp'"
+        ],
+        "correct_columns": {
+            "singer": [
+                "singer_id",
+                "name",
+                "Joe Sharp"
+            ],
+            "concert": [
+                "concert_id",
+                "theme",
+                "concert_name",
+                "year"
+            ],
+            "singer_in_concert": [
+                "concert_id",
+                "singer_id"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.1
+    },
+    {
+        "tool_name": "select_columns",
+        "chain_of_thought_reasoning": "To answer the question, we need to identify concerts held after 2012, compare the number of singers in those concerts to the 'Happy Tonight' themed concert, and retrieve the IDs and names of those concerts. The relevant columns include 'Year' from the concert table to filter concerts after 2012, 'concert_ID' and 'concert_Name' from the concert table to get the required details, and 'Singer_ID' from the singer_in_concert table to count the number of singers in each concert. Additionally, we need 'Theme' from the concert table to identify the 'Happy Tonight' concert for comparison.",
+        "selected_columns": {
+            "concert": [
+                "Year",
+                "concert_ID",
+                "concert_Name",
+                "Theme"
+            ],
+            "singer_in_concert": [
+                "concert_ID",
+                "Singer_ID"
+            ]
+        },
+        "tentative_schema": {
+            "concert": [
+                "Year",
+                "concert_ID",
+                "concert_Name",
+                "Theme"
+            ],
+            "singer_in_concert": [
+                "concert_ID",
+                "Singer_ID"
+            ]
+        },
+        "missing_table_status": "missing_table",
+        "missing_tables": [
+            "singer"
+        ],
+        "missing_column_status": "success",
+        "missing_columns": [],
+        "correct_columns": {
+            "singer": [
+                "singer_id",
+                "name",
+                "Joe Sharp"
+            ],
+            "concert": [
+                "concert_id",
+                "theme",
+                "concert_name",
+                "year"
+            ],
+            "singer_in_concert": [
+                "concert_id",
+                "singer_id"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.2
+    },
+    {
+        "tool_name": "generate_candidate",
+        "node_type": "generate_candidate",
+        "generation_based_candidates": [
+            {
+                "template_name": "generate_candidate_one",
+                "candidates": [
+                    " SELECT T1.concert_ID, T1.concert_Name  FROM concert AS T1  INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID  WHERE T1.Year > '2012'  AND T2.Singer_ID = (SELECT Singer_ID FROM singer WHERE Name = 'Joe Sharp')  GROUP BY T1.concert_ID, T1.concert_Name  HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(*) FROM singer_in_concert AS T4 WHERE T4.concert_ID = (SELECT concert_ID FROM concert WHERE Theme = 'Happy Tonight')) ",
+                    " SELECT C.concert_ID, C.concert_Name  FROM concert AS C  WHERE C.Year > 2012  AND (SELECT COUNT(*)       FROM singer_in_concert AS SIC       WHERE SIC.concert_ID = C.concert_ID) >  (SELECT COUNT(*)   FROM singer_in_concert AS SIC   INNER JOIN concert AS C2 ON SIC.concert_ID = C2.concert_ID   WHERE C2.Theme = 'Happy Tonight') ",
+                    " SELECT C.concert_ID, C.concert_Name, COUNT(S.singer_ID)  FROM concert AS C  INNER JOIN singer_in_concert AS S ON C.concert_ID = S.concert_ID  WHERE C.Year > '2012' AND C.concert_ID IN (SELECT concert_ID FROM singer_in_concert WHERE Singer_ID = (SELECT Singer_ID FROM singer WHERE Name = 'Joe Sharp'))  GROUP BY C.concert_ID, C.concert_Name  HAVING COUNT(S.singer_ID) > (SELECT COUNT(S2.Singer_ID) FROM singer_in_concert AS S2 INNER JOIN concert AS C2 ON S2.concert_ID = C2.concert_ID WHERE C2.Theme = 'Happy Tonight') "
+                ]
+            }
+        ],
+        "candidates": [
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT T1.concert_ID, T1.concert_Name  FROM concert AS T1  INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID  WHERE T1.Year > '2012'  AND T2.Singer_ID = (SELECT Singer_ID FROM singer WHERE Name = 'Joe Sharp')  GROUP BY T1.concert_ID, T1.concert_Name  HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(*) FROM singer_in_concert AS T4 WHERE T4.concert_ID = (SELECT concert_ID FROM concert WHERE Theme = 'Happy Tonight')) ",
+                "plan": "**Question**: If singer Joe Sharp performed in every concert, what are the IDs and names of concerts held after 2012 that have more singers than the \"Happy Tonight\" themed concert, and how many times is it?  \n**Evidence**: \n\n**1. Divide and Conquer:**\n\n* **Main Question:** If singer Joe Sharp performed in every concert, what are the IDs and names of concerts held after 2012 that have more singers than the \"Happy Tonight\" themed concert, and how many times is it?\n    * **Analysis:** We need to find concerts held after 2012, count the number of singers in each concert, and compare this count to the number of singers in the \"Happy Tonight\" themed concert. We will also need to ensure that Joe Sharp performed in every concert.\n    * **Pseudo SQL:** \n    ```sql\n    SELECT T1.concert_ID, T1.concert_Name \n    FROM concert AS T1 \n    INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID \n    WHERE T1.Year > '2012' AND \n    (SELECT COUNT(*) FROM singer_in_concert AS T3 WHERE T3.concert_ID = T1.concert_ID) > \n    (SELECT COUNT(*) FROM singer_in_concert AS T4 \n     WHERE T4.concert_ID = (SELECT concert_ID FROM concert WHERE Theme = 'Happy Tonight')) \n    GROUP BY T1.concert_ID, T1.concert_Name\n    ```\n\n* **Sub-question 1:** Count of singers in the \"Happy Tonight\" themed concert\n    * **Analysis:** We need to find the concert ID for the \"Happy Tonight\" themed concert and count the number of singers associated with it.\n    * **Pseudo SQL:** \n    ```sql\n    SELECT COUNT(*) FROM singer_in_concert \n    WHERE concert_ID = (SELECT concert_ID FROM concert WHERE Theme = 'Happy Tonight')\n    ```\n\n* **Sub-question 2:** Concerts held after 2012\n    * **Analysis:** This is a straightforward filter on the `concert` table using the `Year` column.\n    * **Pseudo SQL:** \n    ```sql\n    T1.Year > '2012'\n    ```\n\n* **Sub-question 3:** Ensure Joe Sharp performed in every concert\n    * **Analysis:** We need to check that Joe Sharp's `Singer_ID` is present in the `singer_in_concert` table for each concert.\n    * **Pseudo SQL:** \n    ```sql\n    T2.Singer_ID = (SELECT Singer_ID FROM singer WHERE Name = 'Joe Sharp')\n    ```\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (Count of singers in the \"Happy Tonight\" themed concert):**\n    * **SQL:** \n    ```sql\n    (SELECT COUNT(*) FROM singer_in_concert \n     WHERE concert_ID = (SELECT concert_ID FROM concert WHERE Theme = 'Happy Tonight'))\n    ```\n\n* **Sub-question 2 (Concerts held after 2012):**\n    * **SQL:** \n    ```sql\n    T1.Year > '2012'\n    ```\n\n* **Sub-question 3 (Ensure Joe Sharp performed in every concert):**\n    * **SQL:** \n    ```sql\n    T2.Singer_ID = (SELECT Singer_ID FROM singer WHERE Name = 'Joe Sharp')\n    ```\n\n* **Main Question (IDs and names of concerts):**\n    * **SQL:** \n    ```sql\n    SELECT T1.concert_ID, T1.concert_Name \n    FROM concert AS T1 \n    INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID \n    WHERE T1.Year > '2012' AND \n    (SELECT COUNT(*) FROM singer_in_concert AS T3 WHERE T3.concert_ID = T1.concert_ID) > \n    (SELECT COUNT(*) FROM singer_in_concert AS T4 \n     WHERE T4.concert_ID = (SELECT concert_ID FROM concert WHERE Theme = 'Happy Tonight')) \n    AND T2.Singer_ID = (SELECT Singer_ID FROM singer WHERE Name = 'Joe Sharp')\n    GROUP BY T1.concert_ID, T1.concert_Name\n    ```\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by ensuring that we only join the necessary tables and filter based on the conditions directly in the main query.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT C.concert_ID, C.concert_Name  FROM concert AS C  WHERE C.Year > 2012  AND (SELECT COUNT(*)       FROM singer_in_concert AS SIC       WHERE SIC.concert_ID = C.concert_ID) >  (SELECT COUNT(*)   FROM singer_in_concert AS SIC   INNER JOIN concert AS C2 ON SIC.concert_ID = C2.concert_ID   WHERE C2.Theme = 'Happy Tonight') ",
+                "plan": "**Question**: If singer Joe Sharp performed in every concert, what are the IDs and names of concerts held after 2012 that have more singers than the \"Happy Tonight\" themed concert, and how many times is it?  \n**Evidence**: \n\n**1. Divide and Conquer:**\n\n* **Main Question:** If singer Joe Sharp performed in every concert, what are the IDs and names of concerts held after 2012 that have more singers than the \"Happy Tonight\" themed concert, and how many times is it?\n    * **Analysis:** We need to find concerts held after 2012, count the number of singers in each concert, and compare this count to the number of singers in the \"Happy Tonight\" themed concert. We also need to ensure that Joe Sharp performed in every concert.\n    * **Pseudo SQL:** \n    ```sql\n    SELECT concert_ID, concert_Name \n    FROM concert AS C \n    WHERE Year > 2012 \n    AND (SELECT COUNT(*) FROM singer_in_concert AS SIC WHERE SIC.concert_ID = C.concert_ID) > \n    (SELECT COUNT(*) FROM singer_in_concert AS SIC2 \n     INNER JOIN concert AS C2 ON SIC2.concert_ID = C2.concert_ID \n     WHERE C2.Theme = 'Happy Tonight')\n    ```\n\n    * **Sub-question 1:** Count of singers in the \"Happy Tonight\" themed concert\n        * **Analysis:** We need to join the `singer_in_concert` and `concert` tables to filter by the theme and count the number of singers.\n        * **Pseudo SQL:** \n        ```sql\n        SELECT COUNT(*) \n        FROM singer_in_concert AS SIC \n        INNER JOIN concert AS C2 ON SIC.concert_ID = C2.concert_ID \n        WHERE C2.Theme = 'Happy Tonight'\n        ```\n\n    * **Sub-question 2:** Count of singers in each concert held after 2012\n        * **Analysis:** We will count the number of singers for each concert held after 2012.\n        * **Pseudo SQL:** \n        ```sql\n        SELECT COUNT(*) \n        FROM singer_in_concert AS SIC \n        WHERE SIC.concert_ID = C.concert_ID\n        ```\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (count of singers in \"Happy Tonight\" themed concert):**\n    * **SQL:** \n    ```sql\n    (SELECT COUNT(*) \n     FROM singer_in_concert AS SIC \n     INNER JOIN concert AS C2 ON SIC.concert_ID = C2.concert_ID \n     WHERE C2.Theme = 'Happy Tonight')\n    ```\n\n* **Sub-question 2 (count of singers in each concert held after 2012):**\n    * **SQL:** \n    ```sql\n    (SELECT COUNT(*) \n     FROM singer_in_concert AS SIC \n     WHERE SIC.concert_ID = C.concert_ID)\n    ```\n\n* **Main Question (concerts held after 2012 with more singers than \"Happy Tonight\"):**\n    * **SQL:** \n    ```sql\n    SELECT C.concert_ID, C.concert_Name \n    FROM concert AS C \n    WHERE C.Year > 2012 \n    AND (SELECT COUNT(*) \n         FROM singer_in_concert AS SIC \n         WHERE SIC.concert_ID = C.concert_ID) > \n    (SELECT COUNT(*) \n     FROM singer_in_concert AS SIC \n     INNER JOIN concert AS C2 ON SIC.concert_ID = C2.concert_ID \n     WHERE C2.Theme = 'Happy Tonight')\n    ```\n\n**3. Simplification and Optimization:**\n\n* The SQL query from step 2 is already efficient. We are using subqueries to count singers and filter concerts based on the conditions provided. \n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT C.concert_ID, C.concert_Name, COUNT(S.singer_ID)  FROM concert AS C  INNER JOIN singer_in_concert AS S ON C.concert_ID = S.concert_ID  WHERE C.Year > '2012' AND C.concert_ID IN (SELECT concert_ID FROM singer_in_concert WHERE Singer_ID = (SELECT Singer_ID FROM singer WHERE Name = 'Joe Sharp'))  GROUP BY C.concert_ID, C.concert_Name  HAVING COUNT(S.singer_ID) > (SELECT COUNT(S2.Singer_ID) FROM singer_in_concert AS S2 INNER JOIN concert AS C2 ON S2.concert_ID = C2.concert_ID WHERE C2.Theme = 'Happy Tonight') ",
+                "plan": "**Question**: If singer Joe Sharp performed in every concert, what are the IDs and names of concerts held after 2012 that have more singers than the \"Happy Tonight\" themed concert, and how many times is it?\n\n**1. Divide and Conquer:**\n\n* **Main Question:** If singer Joe Sharp performed in every concert, what are the IDs and names of concerts held after 2012 that have more singers than the \"Happy Tonight\" themed concert, and how many times is it?\n    * **Analysis:** We need to find concerts held after 2012, count the number of singers for each concert, and compare this count to the number of singers in the \"Happy Tonight\" themed concert. We will also need to ensure that Joe Sharp performed in every concert.\n    * **Pseudo SQL:** \n    ```sql\n    SELECT `concert_ID`, `concert_Name`, COUNT(`singer_ID`) \n    FROM `concert` AS `C` \n    INNER JOIN `singer_in_concert` AS `S` ON `C`.`concert_ID` = `S`.`concert_ID` \n    WHERE `C`.`Year` > '2012' AND `C`.`concert_ID` IN (SELECT `concert_ID` FROM `singer_in_concert` WHERE `Singer_ID` = (SELECT `Singer_ID` FROM `singer` WHERE `Name` = 'Joe Sharp')) \n    GROUP BY `C`.`concert_ID`, `C`.`concert_Name` \n    HAVING COUNT(`singer_ID`) > (SELECT COUNT(`S2`.`Singer_ID`) FROM `singer_in_concert` AS `S2` INNER JOIN `concert` AS `C2` ON `S2`.`concert_ID` = `C2`.`concert_ID` WHERE `C2`.`Theme` = 'Happy Tonight')\n    ```\n\n* **Sub-question 1:** Concerts held after 2012\n    * **Analysis:** This is a straightforward filter on the `concert` table using the `Year` column.\n    * **Pseudo SQL:** `C.Year > '2012'`\n\n* **Sub-question 2:** Count of singers in each concert\n    * **Analysis:** We will join the `concert` and `singer_in_concert` tables to count the number of singers for each concert.\n    * **Pseudo SQL:** `COUNT(S.singer_ID)`\n\n* **Sub-question 3:** Count of singers in the \"Happy Tonight\" themed concert\n    * **Analysis:** We need to filter the `concert` table for the \"Happy Tonight\" theme and count the number of singers.\n    * **Pseudo SQL:** `SELECT COUNT(S2.Singer_ID) FROM singer_in_concert AS S2 INNER JOIN concert AS C2 ON S2.concert_ID = C2.concert_ID WHERE C2.Theme = 'Happy Tonight'`\n\n* **Sub-question 4:** Ensure Joe Sharp performed in every concert\n    * **Analysis:** We will filter the concerts to include only those where Joe Sharp is a performer.\n    * **Pseudo SQL:** `C.concert_ID IN (SELECT concert_ID FROM singer_in_concert WHERE Singer_ID = (SELECT Singer_ID FROM singer WHERE Name = 'Joe Sharp'))`\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (concerts held after 2012):**\n    * **SQL:** `C.Year > '2012'`\n\n* **Sub-question 2 (count of singers in each concert):**\n    * **SQL:** `COUNT(S.singer_ID)`\n\n* **Sub-question 3 (count of singers in the \"Happy Tonight\" themed concert):**\n    * **SQL:** `SELECT COUNT(S2.Singer_ID) FROM singer_in_concert AS S2 INNER JOIN concert AS C2 ON S2.concert_ID = C2.concert_ID WHERE C2.Theme = 'Happy Tonight'`\n\n* **Sub-question 4 (ensure Joe Sharp performed in every concert):**\n    * **SQL:** `C.concert_ID IN (SELECT concert_ID FROM singer_in_concert WHERE Singer_ID = (SELECT Singer_ID FROM singer WHERE Name = 'Joe Sharp'))`\n\n* **Main Question (IDs and names of concerts):**\n    * **SQL:** \n    ```sql\n    SELECT C.concert_ID, C.concert_Name, COUNT(S.singer_ID) \n    FROM concert AS C \n    INNER JOIN singer_in_concert AS S ON C.concert_ID = S.concert_ID \n    WHERE C.Year > '2012' AND C.concert_ID IN (SELECT concert_ID FROM singer_in_concert WHERE Singer_ID = (SELECT Singer_ID FROM singer WHERE Name = 'Joe Sharp')) \n    GROUP BY C.concert_ID, C.concert_Name \n    HAVING COUNT(S.singer_ID) > (SELECT COUNT(S2.Singer_ID) FROM singer_in_concert AS S2 INNER JOIN concert AS C2 ON S2.concert_ID = C2.concert_ID WHERE C2.Theme = 'Happy Tonight')\n    ```\n\n**3. Simplification and Optimization:**\n\n* The SQL query from step 2 is already efficient, using `INNER JOIN` to combine the necessary tables and filtering based on the required conditions. \n\n**Final Optimized SQL Query:**\n\n"
+            }
+        ],
+        "status": "success",
+        "execution_time": 10.8
+    },
+    {
+        "tool_name": "revise",
+        "original_SQL_id": "generate_candidate",
+        "refined_SQL_id": "revise_1",
+        "candidates": [
+            {
+                "refined_query": " SELECT T1.concert_ID, T1.concert_Name FROM concert AS T1 INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID WHERE T1.Year > '2012' GROUP BY T1.concert_ID, T1.concert_Name HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(*) FROM singer_in_concert AS T4 WHERE T4.concert_ID = (SELECT concert_ID FROM concert WHERE Theme = 'Happy Tonight')) AND T2.Singer_ID = (SELECT Singer_ID FROM singer WHERE Name = 'Joe Sharp') "
+            },
+            {
+                "refined_query": " SELECT C.concert_ID, C.concert_Name  FROM concert AS C  WHERE C.Year > 2012  AND (SELECT COUNT(*)       FROM singer_in_concert AS SIC       WHERE SIC.concert_ID = C.concert_ID) >  (SELECT COUNT(*)   FROM singer_in_concert AS SIC   INNER JOIN concert AS C2 ON SIC.concert_ID = C2.concert_ID   WHERE C2.Theme = 'Happy Tonight') "
+            },
+            {
+                "refined_query": " SELECT C.concert_ID, C.concert_Name, COUNT(S.singer_ID) FROM concert AS C INNER JOIN singer_in_concert AS S ON C.concert_ID = S.concert_ID WHERE C.Year > '2012' AND C.concert_ID IN (SELECT concert_ID FROM singer_in_concert WHERE Singer_ID = (SELECT Singer_ID FROM singer WHERE Name = 'Joe Sharp')) GROUP BY C.concert_ID, C.concert_Name HAVING COUNT(S.singer_ID) > (SELECT COUNT(S2.Singer_ID) FROM singer_in_concert AS S2 INNER JOIN concert AS C2 ON S2.concert_ID = C2.concert_ID WHERE C2.Theme = 'Happy Tonight') "
+            }
+        ],
+        "status": "success",
+        "execution_time": 9.7
+    },
+    {
+        "tool_name": "execution_accuracy",
+        "generate_candidate": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "If singer Joe Sharp performed in every concert, what are the IDs and names of concerts held after 2012 has more singers than the \"Happy Tonight\" themed concert, and and how many times is it?",
+            "Evidence": "",
+            "GOLD_SQL": "SELECT A.concert_ID, A.concert_Name, 1.0 * (COUNT (DISTINCT (B.Singer_ID)) + 1) / (SELECT COUNT (DISTINCT (B.Singer_ID)) + 1 FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Theme = \"Happy Tonight\" AND B.Singer_ID != (SELECT Singer_ID FROM singer WHERE Name = \"Joe Sharp\" ) ) AS times FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Year > 2012 AND B.Singer_ID != (SELECT Singer_ID FROM singer WHERE Name = \"Joe Sharp\" ) GROUP BY A.concert_ID HAVING (COUNT (DISTINCT (B.Singer_ID)) + 1) > (SELECT COUNT (DISTINCT (B.Singer_ID)) + 1 FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Theme = \"Happy Tonight\" AND B.Singer_ID != (SELECT Singer_ID FROM singer WHERE Name = \"Joe Sharp\" ) )",
+            "PREDICTED_SQL": " SELECT T1.concert_ID, T1.concert_Name  FROM concert AS T1  INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID  WHERE T1.Year > '2012'  AND T2.Singer_ID = (SELECT Singer_ID FROM singer WHERE Name = 'Joe Sharp')  GROUP BY T1.concert_ID, T1.concert_Name  HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(*) FROM singer_in_concert AS T4 WHERE T4.concert_ID = (SELECT concert_ID FROM concert WHERE Theme = 'Happy Tonight')) "
+        },
+        "revise_1": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "If singer Joe Sharp performed in every concert, what are the IDs and names of concerts held after 2012 has more singers than the \"Happy Tonight\" themed concert, and and how many times is it?",
+            "Evidence": "",
+            "GOLD_SQL": "SELECT A.concert_ID, A.concert_Name, 1.0 * (COUNT (DISTINCT (B.Singer_ID)) + 1) / (SELECT COUNT (DISTINCT (B.Singer_ID)) + 1 FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Theme = \"Happy Tonight\" AND B.Singer_ID != (SELECT Singer_ID FROM singer WHERE Name = \"Joe Sharp\" ) ) AS times FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Year > 2012 AND B.Singer_ID != (SELECT Singer_ID FROM singer WHERE Name = \"Joe Sharp\" ) GROUP BY A.concert_ID HAVING (COUNT (DISTINCT (B.Singer_ID)) + 1) > (SELECT COUNT (DISTINCT (B.Singer_ID)) + 1 FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Theme = \"Happy Tonight\" AND B.Singer_ID != (SELECT Singer_ID FROM singer WHERE Name = \"Joe Sharp\" ) )",
+            "PREDICTED_SQL": " SELECT T1.concert_ID, T1.concert_Name FROM concert AS T1 INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID WHERE T1.Year > '2012' GROUP BY T1.concert_ID, T1.concert_Name HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(*) FROM singer_in_concert AS T4 WHERE T4.concert_ID = (SELECT concert_ID FROM concert WHERE Theme = 'Happy Tonight')) AND T2.Singer_ID = (SELECT Singer_ID FROM singer WHERE Name = 'Joe Sharp') "
+        },
+        "final_SQL": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "If singer Joe Sharp performed in every concert, what are the IDs and names of concerts held after 2012 has more singers than the \"Happy Tonight\" themed concert, and and how many times is it?",
+            "Evidence": "",
+            "GOLD_SQL": "SELECT A.concert_ID, A.concert_Name, 1.0 * (COUNT (DISTINCT (B.Singer_ID)) + 1) / (SELECT COUNT (DISTINCT (B.Singer_ID)) + 1 FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Theme = \"Happy Tonight\" AND B.Singer_ID != (SELECT Singer_ID FROM singer WHERE Name = \"Joe Sharp\" ) ) AS times FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Year > 2012 AND B.Singer_ID != (SELECT Singer_ID FROM singer WHERE Name = \"Joe Sharp\" ) GROUP BY A.concert_ID HAVING (COUNT (DISTINCT (B.Singer_ID)) + 1) > (SELECT COUNT (DISTINCT (B.Singer_ID)) + 1 FROM concert A JOIN singer_in_concert B ON A.concert_ID = B.concert_ID WHERE A.Theme = \"Happy Tonight\" AND B.Singer_ID != (SELECT Singer_ID FROM singer WHERE Name = \"Joe Sharp\" ) )",
+            "PREDICTED_SQL": " SELECT T1.concert_ID, T1.concert_Name FROM concert AS T1 INNER JOIN singer_in_concert AS T2 ON T1.concert_ID = T2.concert_ID WHERE T1.Year > '2012' GROUP BY T1.concert_ID, T1.concert_Name HAVING COUNT(T2.Singer_ID) > (SELECT COUNT(*) FROM singer_in_concert AS T4 WHERE T4.concert_ID = (SELECT concert_ID FROM concert WHERE Theme = 'Happy Tonight')) AND T2.Singer_ID = (SELECT Singer_ID FROM singer WHERE Name = 'Joe Sharp') "
+        },
+        "status": "success",
+        "execution_time": 0.0
+    }
+]

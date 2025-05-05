@@ -1,0 +1,255 @@
+[
+    {
+        "tool_name": "extract_keywords",
+        "keywords": [
+            "2% decrease",
+            "GNP",
+            "top three countries",
+            "highest life expectancy",
+            "continent",
+            "per capita GNP growth rate",
+            "exceeds Europe",
+            "two points",
+            "GNP per capita",
+            "population"
+        ],
+        "status": "success",
+        "execution_time": 1.3
+    },
+    {
+        "tool_name": "retrieve_entity",
+        "similar_columns": {
+            "country": [
+                "GNP",
+                "Continent",
+                "Population",
+                "Capital"
+            ],
+            "city": [
+                "Population"
+            ]
+        },
+        "schema_with_examples": {
+            "country": {
+                "Continent": [
+                    "Europe"
+                ]
+            }
+        },
+        "status": "success",
+        "execution_time": 2.0
+    },
+    {
+        "tool_name": "retrieve_context",
+        "schema_with_descriptions": {},
+        "status": "success",
+        "execution_time": 33.8
+    },
+    {
+        "tool_name": "filter_column",
+        "tentative_schema": {
+            "city": [
+                "CountryCode",
+                "Population"
+            ],
+            "country": [
+                "Name",
+                "Population",
+                "LifeExpectancy",
+                "GNP",
+                "GNPOld",
+                "Continent",
+                "Capital"
+            ],
+            "countrylanguage": [
+                "CountryCode"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'country'.'code'",
+            "'country'.'Europe'"
+        ],
+        "correct_columns": {
+            "country": [
+                "name",
+                "continent",
+                "population",
+                "gnpold",
+                "gnp",
+                "code",
+                "lifeexpectancy",
+                "Europe"
+            ]
+        },
+        "status": "success",
+        "execution_time": 15.8
+    },
+    {
+        "tool_name": "select_tables",
+        "chain_of_thought_reasoning": "To answer the question, we need to identify the top three countries with the highest life expectancy and their corresponding GNP values. The 'country' table contains the necessary columns for life expectancy and GNP. Additionally, we need to calculate the GNP per capita, which requires the population data from the 'country' table as well. To compare the per capita GNP growth rates across continents, we will also need to reference the continent information from the 'country' table. Therefore, the 'country' table is essential for obtaining all the required data. The 'countrylanguage' and 'city' tables are not necessary for this specific analysis as they do not provide relevant information regarding GNP or life expectancy. Thus, only the 'country' table is needed to formulate the SQL query.",
+        "selected_tables": [
+            "country"
+        ],
+        "tentative_schema": {
+            "country": [
+                "Name",
+                "Population",
+                "LifeExpectancy",
+                "GNP",
+                "GNPOld",
+                "Continent",
+                "Capital"
+            ],
+            "city": [
+                "Population"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'country'.'code'",
+            "'country'.'Europe'"
+        ],
+        "correct_columns": {
+            "country": [
+                "name",
+                "continent",
+                "population",
+                "gnpold",
+                "gnp",
+                "code",
+                "lifeexpectancy",
+                "Europe"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.3
+    },
+    {
+        "tool_name": "select_columns",
+        "chain_of_thought_reasoning": "To answer the question, we need to identify the top three countries with the highest life expectancy, which requires the 'LifeExpectancy' column from the 'country' table. We also need the 'GNP' and 'Population' columns from the same table to calculate the GNP per capita. Additionally, we need the 'Continent' column to determine which continent has a per capita GNP growth rate exceeding that of Europe by at least two points. The 'Population' column from the 'country' table is also necessary to compute the per capita GNP, which is essential for comparing growth rates across continents.",
+        "selected_columns": {
+            "country": [
+                "GNP",
+                "Population",
+                "LifeExpectancy",
+                "Continent"
+            ]
+        },
+        "tentative_schema": {
+            "country": [
+                "GNP",
+                "Population",
+                "LifeExpectancy",
+                "Continent"
+            ]
+        },
+        "missing_table_status": "success",
+        "missing_tables": [],
+        "missing_column_status": "missing_column",
+        "missing_columns": [
+            "'country'.'name'",
+            "'country'.'gnpold'",
+            "'country'.'code'",
+            "'country'.'Europe'"
+        ],
+        "correct_columns": {
+            "country": [
+                "name",
+                "continent",
+                "population",
+                "gnpold",
+                "gnp",
+                "code",
+                "lifeexpectancy",
+                "Europe"
+            ]
+        },
+        "status": "success",
+        "execution_time": 2.9
+    },
+    {
+        "tool_name": "generate_candidate",
+        "node_type": "generate_candidate",
+        "generation_based_candidates": [
+            {
+                "template_name": "generate_candidate_one",
+                "candidates": [
+                    " SELECT Continent, AVG((GNP * 0.98) / Population) AS AvgPerCapitaGNP  FROM country  WHERE Code IN (SELECT Code FROM (SELECT Code FROM country ORDER BY LifeExpectancy DESC LIMIT 3))  GROUP BY Continent  HAVING AvgPerCapitaGNP > (SELECT AVG(GNP / Population) FROM country WHERE Continent = 'Europe') + 2 ",
+                    " SELECT Continent, SUM(GNP * 0.98 / Population) AS PerCapitaGNP  FROM country  GROUP BY Continent  HAVING SUM(GNP * 0.98 / Population) > (SELECT SUM(GNP / Population) FROM country WHERE Continent = 'Europe') + 2 ",
+                    " SELECT Continent, AVG(GNP * 0.98 / Population) AS AvgPerCapitaGNP  FROM country  WHERE Code IN (SELECT Code FROM country ORDER BY LifeExpectancy DESC LIMIT 3)  GROUP BY Continent  HAVING AvgPerCapitaGNP > (SELECT AVG(GNP / Population) FROM country WHERE Continent = 'Europe') + 2 "
+                ]
+            }
+        ],
+        "candidates": [
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT Continent, AVG((GNP * 0.98) / Population) AS AvgPerCapitaGNP  FROM country  WHERE Code IN (SELECT Code FROM (SELECT Code FROM country ORDER BY LifeExpectancy DESC LIMIT 3))  GROUP BY Continent  HAVING AvgPerCapitaGNP > (SELECT AVG(GNP / Population) FROM country WHERE Continent = 'Europe') + 2 ",
+                "plan": "**Question**: Assuming a 2% decrease in the GNP of the top three countries with the highest life expectancy, which continent has a per capita GNP growth rate that exceeds Europe by at least two points?  \n**Evidence**: GNP per capita is computed by dividing the GNP by the population.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** Which continent has a per capita GNP growth rate that exceeds Europe by at least two points after a 2% decrease in the GNP of the top three countries with the highest life expectancy?\n    * **Analysis:** We need to first identify the top three countries with the highest life expectancy, calculate their new GNP after a 2% decrease, compute the per capita GNP for these countries, and then compare the growth rate of per capita GNP for each continent against Europe.\n    * **Pseudo SQL:** SELECT `Continent`, <per capita GNP growth rate> FROM `country` WHERE <conditions> GROUP BY `Continent` HAVING <growth rate exceeds Europe by at least two points>\n\n* **Sub-question 1:** Identify the top three countries with the highest life expectancy.\n    * **Analysis:** We will select the top three countries based on the `LifeExpectancy` column.\n    * **Pseudo SQL:** SELECT `Code`, `LifeExpectancy` FROM `country` ORDER BY `LifeExpectancy` DESC LIMIT 3\n\n* **Sub-question 2:** Calculate the new GNP after a 2% decrease for these countries.\n    * **Analysis:** We will take the GNP of the identified countries and apply a 2% decrease.\n    * **Pseudo SQL:** `NewGNP` = `GNP` * 0.98\n\n* **Sub-question 3:** Compute the per capita GNP for these countries.\n    * **Analysis:** The per capita GNP is calculated by dividing the new GNP by the population.\n    * **Pseudo SQL:** `PerCapitaGNP` = `NewGNP` / `Population`\n\n* **Sub-question 4:** Calculate the average per capita GNP for each continent.\n    * **Analysis:** We will group by continent and calculate the average per capita GNP for all countries in each continent.\n    * **Pseudo SQL:** SELECT `Continent`, AVG(`PerCapitaGNP`) FROM `country` GROUP BY `Continent`\n\n* **Sub-question 5:** Compare the average per capita GNP of each continent to that of Europe.\n    * **Analysis:** We will need to find the average per capita GNP for Europe and then filter continents that exceed this by at least two points.\n    * **Pseudo SQL:** HAVING `AVG(PerCapitaGNP)` > (SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Continent` = 'Europe') + 2\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (top three countries with highest life expectancy):**\n    * **SQL:** SELECT `Code`, `LifeExpectancy` FROM `country` ORDER BY `LifeExpectancy` DESC LIMIT 3\n\n* **Sub-question 2 (new GNP after 2% decrease):**\n    * **SQL:** `NewGNP` = `GNP` * 0.98\n\n* **Sub-question 3 (per capita GNP):**\n    * **SQL:** `PerCapitaGNP` = `NewGNP` / `Population`\n\n* **Sub-question 4 (average per capita GNP for each continent):**\n    * **SQL:** SELECT `Continent`, AVG(`NewGNP` / `Population`) AS `AvgPerCapitaGNP` FROM `country` GROUP BY `Continent`\n\n* **Sub-question 5 (compare average per capita GNP of each continent to Europe):**\n    * **SQL:** HAVING `AvgPerCapitaGNP` > (SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Continent` = 'Europe') + 2\n\n* **Main Question (final query):**\n    * **SQL:** SELECT `Continent`, AVG(`NewGNP` / `Population`) AS `AvgPerCapitaGNP` FROM `country` WHERE `Code` IN (SELECT `Code` FROM (SELECT `Code`, `LifeExpectancy` FROM `country` ORDER BY `LifeExpectancy` DESC LIMIT 3)) GROUP BY `Continent` HAVING `AvgPerCapitaGNP` > (SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Continent` = 'Europe') + 2\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by directly calculating the new GNP and per capita GNP in the main query without needing to separately define them in sub-queries.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT Continent, SUM(GNP * 0.98 / Population) AS PerCapitaGNP  FROM country  GROUP BY Continent  HAVING SUM(GNP * 0.98 / Population) > (SELECT SUM(GNP / Population) FROM country WHERE Continent = 'Europe') + 2 ",
+                "plan": "**Question**: Assuming a 2% decrease in the GNP of the top three countries with the highest life expectancy, which continent has a per capita GNP growth rate that exceeds Europe by at least two points?  \n**Evidence**: GNP per capita is computed by dividing the GNP by the population.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** Which continent has a per capita GNP growth rate that exceeds Europe by at least two points after a 2% decrease in the GNP of the top three countries with the highest life expectancy?\n    * **Analysis:** We need to calculate the per capita GNP for each continent after adjusting the GNP of the top three countries with the highest life expectancy. We will then compare these values to the per capita GNP of Europe, ensuring the difference is at least two points.\n    * **Pseudo SQL:** SELECT `Continent`, <per capita GNP growth rate> FROM `country` WHERE <GNP adjusted for top three countries> GROUP BY `Continent` HAVING <growth rate exceeds Europe by at least two points>\n\n* **Sub-question 1:** Identify the top three countries with the highest life expectancy.\n    * **Analysis:** We will select the top three countries based on the `LifeExpectancy` column from the `country` table.\n    * **Pseudo SQL:** SELECT `Code`, `LifeExpectancy` FROM `country` ORDER BY `LifeExpectancy` DESC LIMIT 3\n\n* **Sub-question 2:** Calculate the adjusted GNP for these countries after a 2% decrease.\n    * **Analysis:** For the top three countries identified, we will calculate the new GNP after applying a 2% decrease.\n    * **Pseudo SQL:** `Adjusted GNP` = `GNP` * 0.98 WHERE `Code` IN (<top three countries>)\n\n* **Sub-question 3:** Calculate the per capita GNP for each continent.\n    * **Analysis:** We will compute the per capita GNP for each continent using the adjusted GNP and the population.\n    * **Pseudo SQL:** SELECT `Continent`, SUM(`Adjusted GNP` / `Population`) AS `PerCapitaGNP` FROM `country` GROUP BY `Continent`\n\n* **Sub-question 4:** Calculate the per capita GNP for Europe.\n    * **Analysis:** We will compute the per capita GNP specifically for Europe to use as a comparison.\n    * **Pseudo SQL:** SELECT SUM(`GNP` / `Population`) AS `EuropePerCapitaGNP` FROM `country` WHERE `Continent` = 'Europe'\n\n* **Sub-question 5:** Compare the per capita GNP of other continents to Europe.\n    * **Analysis:** We will filter the results to find continents where the per capita GNP exceeds the European per capita GNP by at least two points.\n    * **Pseudo SQL:** HAVING `PerCapitaGNP` > `EuropePerCapitaGNP` + 2\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (top three countries with highest life expectancy):**\n    * **SQL:** SELECT `Code` FROM `country` ORDER BY `LifeExpectancy` DESC LIMIT 3\n\n* **Sub-question 2 (adjusted GNP for top three countries):**\n    * **SQL:** `Adjusted GNP` = `GNP` * 0.98 WHERE `Code` IN (SELECT `Code` FROM `country` ORDER BY `LifeExpectancy` DESC LIMIT 3)\n\n* **Sub-question 3 (per capita GNP for each continent):**\n    * **SQL:** SELECT `Continent`, SUM(`GNP` * 0.98 / `Population`) AS `PerCapitaGNP` FROM `country` GROUP BY `Continent`\n\n* **Sub-question 4 (per capita GNP for Europe):**\n    * **SQL:** SELECT SUM(`GNP` / `Population`) AS `EuropePerCapitaGNP` FROM `country` WHERE `Continent` = 'Europe'\n\n* **Sub-question 5 (compare per capita GNP of continents to Europe):**\n    * **SQL:** HAVING `PerCapitaGNP` > (SELECT SUM(`GNP` / `Population`) FROM `country` WHERE `Continent` = 'Europe') + 2\n\n* **Main Question (final query):**\n    * **SQL:** SELECT `Continent`, SUM(`GNP` * 0.98 / `Population`) AS `PerCapitaGNP` FROM `country` GROUP BY `Continent` HAVING SUM(`GNP` * 0.98 / `Population`) > (SELECT SUM(`GNP` / `Population`) FROM `country` WHERE `Continent` = 'Europe') + 2\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by directly incorporating the calculations and conditions into a single query without the need for multiple sub-queries.\n\n**Final Optimized SQL Query:**\n\n"
+            },
+            {
+                "chain_of_thought_reasoning": "",
+                "SQL": " SELECT Continent, AVG(GNP * 0.98 / Population) AS AvgPerCapitaGNP  FROM country  WHERE Code IN (SELECT Code FROM country ORDER BY LifeExpectancy DESC LIMIT 3)  GROUP BY Continent  HAVING AvgPerCapitaGNP > (SELECT AVG(GNP / Population) FROM country WHERE Continent = 'Europe') + 2 ",
+                "plan": "**Question**: Assuming a 2% decrease in the GNP of the top three countries with the highest life expectancy, which continent has a per capita GNP growth rate that exceeds Europe by at least two points?  \n**Evidence**: GNP per capita is computed by dividing the GNP by the population.\n\n**1. Divide and Conquer:**\n\n* **Main Question:** Which continent has a per capita GNP growth rate that exceeds Europe by at least two points after a 2% decrease in the GNP of the top three countries with the highest life expectancy?\n    * **Analysis:** We need to first identify the top three countries with the highest life expectancy, calculate their new GNP after a 2% decrease, compute the per capita GNP for these countries, and then compare the growth rate of per capita GNP for each continent against Europe.\n    * **Pseudo SQL:** SELECT `Continent`, <per capita GNP growth rate> FROM `country` WHERE <conditions> GROUP BY `Continent` HAVING <growth rate exceeds Europe by at least two points>\n\n* **Sub-question 1:** Identify the top three countries with the highest life expectancy.\n    * **Analysis:** We will select the top three countries based on the `LifeExpectancy` column.\n    * **Pseudo SQL:** SELECT `Code`, `LifeExpectancy` FROM `country` ORDER BY `LifeExpectancy` DESC LIMIT 3\n\n* **Sub-question 2:** Calculate the new GNP after a 2% decrease for these countries.\n    * **Analysis:** We will take the GNP of the top three countries and apply a 2% decrease.\n    * **Pseudo SQL:** `NewGNP` = `GNP` * 0.98\n\n* **Sub-question 3:** Compute the per capita GNP for these countries.\n    * **Analysis:** The per capita GNP is calculated by dividing the new GNP by the population.\n    * **Pseudo SQL:** `PerCapitaGNP` = `NewGNP` / `Population`\n\n* **Sub-question 4:** Calculate the average per capita GNP for each continent.\n    * **Analysis:** We will group by continent and calculate the average per capita GNP.\n    * **Pseudo SQL:** SELECT `Continent`, AVG(`PerCapitaGNP`) FROM `country` GROUP BY `Continent`\n\n* **Sub-question 5:** Compare the average per capita GNP of each continent to that of Europe.\n    * **Analysis:** We will need to first calculate the average per capita GNP for Europe and then filter continents that exceed this by at least two points.\n    * **Pseudo SQL:** HAVING `AVG(PerCapitaGNP)` > (SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Continent` = 'Europe') + 2\n\n**2. Assembling SQL:**\n\n* **Sub-question 1 (top three countries with highest life expectancy):**\n    * **SQL:** SELECT `Code`, `LifeExpectancy` FROM `country` ORDER BY `LifeExpectancy` DESC LIMIT 3\n\n* **Sub-question 2 (new GNP after 2% decrease):**\n    * **SQL:** `NewGNP` = `GNP` * 0.98\n\n* **Sub-question 3 (per capita GNP):**\n    * **SQL:** `PerCapitaGNP` = `NewGNP` / `Population`\n\n* **Sub-question 4 (average per capita GNP for each continent):**\n    * **SQL:** SELECT `Continent`, AVG(`NewGNP` * 0.98 / `Population`) AS `AvgPerCapitaGNP` FROM `country` GROUP BY `Continent`\n\n* **Sub-question 5 (compare to Europe):**\n    * **SQL:** HAVING `AvgPerCapitaGNP` > (SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Continent` = 'Europe') + 2\n\n* **Main Question (final query):**\n    * **SQL:** SELECT `Continent`, AVG(`GNP` * 0.98 / `Population`) AS `AvgPerCapitaGNP` FROM `country` WHERE `Code` IN (SELECT `Code` FROM `country` ORDER BY `LifeExpectancy` DESC LIMIT 3) GROUP BY `Continent` HAVING `AvgPerCapitaGNP` > (SELECT AVG(`GNP` / `Population`) FROM `country` WHERE `Continent` = 'Europe') + 2\n\n**3. Simplification and Optimization:**\n\n* The final SQL query can be simplified by directly calculating the average per capita GNP for the top three countries and comparing it to Europe in a single query.\n\n**Final Optimized SQL Query:**\n\n"
+            }
+        ],
+        "status": "success",
+        "execution_time": 16.2
+    },
+    {
+        "tool_name": "revise",
+        "original_SQL_id": "generate_candidate",
+        "refined_SQL_id": "revise_1",
+        "candidates": [
+            {
+                "refined_query": " SELECT Continent, AVG((GNP * 0.98) / Population) AS AvgPerCapitaGNP FROM country WHERE Code IN (SELECT Code FROM country ORDER BY LifeExpectancy DESC LIMIT 3) GROUP BY Continent HAVING AvgPerCapitaGNP > (SELECT AVG(GNP / Population) FROM country WHERE Continent = 'Europe') + 2 "
+            },
+            {
+                "refined_query": " SELECT Continent, SUM(GNP * 0.98 / Population) AS PerCapitaGNP FROM country WHERE Code IN (SELECT Code FROM country ORDER BY LifeExpectancy DESC LIMIT 3) GROUP BY Continent HAVING SUM(GNP * 0.98 / Population) > (SELECT SUM(GNP / Population) FROM country WHERE Continent = 'Europe') + 2 "
+            },
+            {
+                "refined_query": " SELECT Continent, AVG(GNP * 0.98 / Population) AS AvgPerCapitaGNP FROM country WHERE Code IN (SELECT Code FROM country ORDER BY LifeExpectancy DESC LIMIT 3) GROUP BY Continent HAVING AvgPerCapitaGNP > (SELECT AVG(GNP / Population) FROM country WHERE Continent = 'Europe') + 2 "
+            }
+        ],
+        "status": "success",
+        "execution_time": 8.7
+    },
+    {
+        "tool_name": "execution_accuracy",
+        "generate_candidate": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "Assuming a 2% decrease in the GNP of the top three countries with the highest life expectancy, which continent has a per capita GNP growth rate that exceeds Europe by at least two points?",
+            "Evidence": "GNP per capita is computed by dividing the GNP by the population.",
+            "GOLD_SQL": "SELECT Continent FROM ( SELECT name , Continent , GNP * ( 1 - 0.02 ) AS GNP , Population , GNPOld FROM country WHERE Code IN ( SELECT Code FROM country ORDER BY LifeExpectancy DESC LIMIT 3 ) UNION ALL SELECT name , Continent , GNP , Population , GNPOld FROM country WHERE Code NOT IN ( SELECT Code FROM country ORDER BY LifeExpectancy DESC LIMIT 3 ) ) GROUP BY Continent HAVING 1.0 * ( SUM ( GNP ) / SUM ( Population ) - SUM ( GNPOld ) / SUM ( Population ) ) / ( SUM ( GNPOld ) / SUM ( Population ) ) >= ( SELECT 1.0 * ( SUM ( GNP ) / SUM ( Population ) - SUM ( GNPOld ) / SUM ( Population ) ) / ( SUM ( GNPOld ) / SUM ( Population ) ) FROM country WHERE Continent = \"Europe\" ) + 0.02",
+            "PREDICTED_SQL": " SELECT Continent, AVG((GNP * 0.98) / Population) AS AvgPerCapitaGNP  FROM country  WHERE Code IN (SELECT Code FROM (SELECT Code FROM country ORDER BY LifeExpectancy DESC LIMIT 3))  GROUP BY Continent  HAVING AvgPerCapitaGNP > (SELECT AVG(GNP / Population) FROM country WHERE Continent = 'Europe') + 2 "
+        },
+        "revise_1": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "Assuming a 2% decrease in the GNP of the top three countries with the highest life expectancy, which continent has a per capita GNP growth rate that exceeds Europe by at least two points?",
+            "Evidence": "GNP per capita is computed by dividing the GNP by the population.",
+            "GOLD_SQL": "SELECT Continent FROM ( SELECT name , Continent , GNP * ( 1 - 0.02 ) AS GNP , Population , GNPOld FROM country WHERE Code IN ( SELECT Code FROM country ORDER BY LifeExpectancy DESC LIMIT 3 ) UNION ALL SELECT name , Continent , GNP , Population , GNPOld FROM country WHERE Code NOT IN ( SELECT Code FROM country ORDER BY LifeExpectancy DESC LIMIT 3 ) ) GROUP BY Continent HAVING 1.0 * ( SUM ( GNP ) / SUM ( Population ) - SUM ( GNPOld ) / SUM ( Population ) ) / ( SUM ( GNPOld ) / SUM ( Population ) ) >= ( SELECT 1.0 * ( SUM ( GNP ) / SUM ( Population ) - SUM ( GNPOld ) / SUM ( Population ) ) / ( SUM ( GNPOld ) / SUM ( Population ) ) FROM country WHERE Continent = \"Europe\" ) + 0.02",
+            "PREDICTED_SQL": " SELECT Continent, AVG((GNP * 0.98) / Population) AS AvgPerCapitaGNP FROM country WHERE Code IN (SELECT Code FROM country ORDER BY LifeExpectancy DESC LIMIT 3) GROUP BY Continent HAVING AvgPerCapitaGNP > (SELECT AVG(GNP / Population) FROM country WHERE Continent = 'Europe') + 2 "
+        },
+        "final_SQL": {
+            "exec_res": 0,
+            "exec_err": "incorrect answer",
+            "Question": "Assuming a 2% decrease in the GNP of the top three countries with the highest life expectancy, which continent has a per capita GNP growth rate that exceeds Europe by at least two points?",
+            "Evidence": "GNP per capita is computed by dividing the GNP by the population.",
+            "GOLD_SQL": "SELECT Continent FROM ( SELECT name , Continent , GNP * ( 1 - 0.02 ) AS GNP , Population , GNPOld FROM country WHERE Code IN ( SELECT Code FROM country ORDER BY LifeExpectancy DESC LIMIT 3 ) UNION ALL SELECT name , Continent , GNP , Population , GNPOld FROM country WHERE Code NOT IN ( SELECT Code FROM country ORDER BY LifeExpectancy DESC LIMIT 3 ) ) GROUP BY Continent HAVING 1.0 * ( SUM ( GNP ) / SUM ( Population ) - SUM ( GNPOld ) / SUM ( Population ) ) / ( SUM ( GNPOld ) / SUM ( Population ) ) >= ( SELECT 1.0 * ( SUM ( GNP ) / SUM ( Population ) - SUM ( GNPOld ) / SUM ( Population ) ) / ( SUM ( GNPOld ) / SUM ( Population ) ) FROM country WHERE Continent = \"Europe\" ) + 0.02",
+            "PREDICTED_SQL": " SELECT Continent, AVG((GNP * 0.98) / Population) AS AvgPerCapitaGNP FROM country WHERE Code IN (SELECT Code FROM country ORDER BY LifeExpectancy DESC LIMIT 3) GROUP BY Continent HAVING AvgPerCapitaGNP > (SELECT AVG(GNP / Population) FROM country WHERE Continent = 'Europe') + 2 "
+        },
+        "status": "success",
+        "execution_time": 0.0
+    }
+]
