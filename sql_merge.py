@@ -221,7 +221,7 @@ Your main tasks are:
                 sql_thought, token_cost_ = chat_with_llm(chat_revirse_sql, n=1, temperature=0, max_tokens=8192)
                 predicted_sql = [util.getSql(output) for output in sql_thought][0]
             else:
-                chat_revirse_sql.append([
+                chat_revirse_sql.extend([
                     {
                         "role": "assistant",
                         "content": f"```sql {predicted_sql} ```"
