@@ -189,11 +189,14 @@ def process_file(file_paths, output_dir, db_base_dir):
     predicted_sql_merge = [{"sql":merge_json["predicted_sql"],"type":"merge"}]
     sqls = predicted_sql_direct + predicted_sql_filter + predicted_sql_merge
     sqls = get_best_sqls(sqls,db_path,final_results)
+    type = "direct"
     if len(sqls) == 0:
         sqls = [random.choice(predicted_sql_direct + predicted_sql_filter + predicted_sql_merge)]
         predicted_sql = sqls[0]["sql"]
+        type = sqls[0]["type"]
     elif len(sqls) == 1:
         predicted_sql = sqls[0]["sql"]
+        type = sqls[0]["type"]
     else:
         prompt = [
         {
@@ -223,6 +226,10 @@ def process_file(file_paths, output_dir, db_base_dir):
         )
         response,token_cost_ = chat_with_llm(prompt,n=1,temperature=0,max_tokens=8192)
         predicted_sql = util.getSql(response[0])
+        for i in range(len(sqls)):
+            if sqls[i]["sql"] == predicted_sql:
+                type = sqls[i]["type"]
+                break
 
     try:
         result_predicted_sql = util.execute_sql(db_path, predicted_sql)
@@ -244,7 +251,6 @@ def process_file(file_paths, output_dir, db_base_dir):
     # Get question hardness
     hardness = util.getHardness(question)
 
-    type = sqls[0]["type"]
     for i in range(len(sqls)):
         if predicted_sql == sqls[i]["sql"]:
             type = sqls[i]["type"]
